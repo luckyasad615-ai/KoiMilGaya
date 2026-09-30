@@ -1,5 +1,6 @@
 const sampleProfiles = [
   {
+    _id: "65a000000000000000000001",
     fullName: "Ayesha Malik",
     email: "ayesha.malik@example.com",
     password: "Password123!",
@@ -13,6 +14,7 @@ const sampleProfiles = [
     isSample: true
   },
   {
+    _id: "65a000000000000000000002",
     fullName: "Sophia Reynolds",
     email: "sophia.r@example.com",
     password: "Password123!",
@@ -26,6 +28,7 @@ const sampleProfiles = [
     isSample: true
   },
   {
+    _id: "65a000000000000000000003",
     fullName: "Zain Ahmed",
     email: "zain.ahmed@example.com",
     password: "Password123!",
@@ -39,6 +42,7 @@ const sampleProfiles = [
     isSample: true
   },
   {
+    _id: "65a000000000000000000004",
     fullName: "Michael Vance",
     email: "michael.vance@example.com",
     password: "Password123!",
@@ -52,6 +56,7 @@ const sampleProfiles = [
     isSample: true
   },
   {
+    _id: "65a000000000000000000005",
     fullName: "Mahnoor Khan",
     email: "mahnoor.khan@example.com",
     password: "Password123!",
@@ -65,6 +70,7 @@ const sampleProfiles = [
     isSample: true
   },
   {
+    _id: "65a000000000000000000006",
     fullName: "Zara Shah",
     email: "zara.shah@example.com",
     password: "Password123!",
@@ -78,6 +84,7 @@ const sampleProfiles = [
     isSample: true
   },
   {
+    _id: "65a000000000000000000007",
     fullName: "Danial Tariq",
     email: "danial.tariq@example.com",
     password: "Password123!",
@@ -91,6 +98,7 @@ const sampleProfiles = [
     isSample: true
   },
   {
+    _id: "65a000000000000000000008",
     fullName: "Lucas Miller",
     email: "lucas.miller@example.com",
     password: "Password123!",
@@ -106,4 +114,5 @@ const sampleProfiles = [
 ];
 
 module.exports = { sampleProfiles };
+
 

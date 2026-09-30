@@ -8,6 +8,7 @@ const getAllUsers = async (req, res) => {
     const { search, city, gender, minAge, maxAge } = req.query;
     const isConnected = await connectDB().catch(() => false);
 
+    let mongoUsers = [];
     if (isConnected && isMongooseConnected) {
       try {
         let query = {};
@@ -33,14 +34,14 @@ const getAllUsers = async (req, res) => {
           if (maxAge) query.age.$lte = Number(maxAge);
         }
 
-        const users = await User.find(query).select('-password').sort({ createdAt: -1 });
-        return res.status(200).json({ success: true, count: users.length, users });
+        const found = await User.find(query).select('-password').sort({ createdAt: -1 });
+        mongoUsers = found.map(u => (u.toObject ? u.toObject() : u));
       } catch (dbErr) {
         console.warn('MongoDB getAllUsers error, falling back to memDb:', dbErr.message);
       }
     }
 
-    const users = await memDb.findUsers({
+    const memUsers = await memDb.findUsers({
       search,
       city,
       gender,
@@ -49,12 +50,18 @@ const getAllUsers = async (req, res) => {
       excludeId: req.user?._id,
     });
 
-    const usersWithoutPassword = users.map((u) => {
-      const { password, ...rest } = u;
-      return rest;
-    });
+    // Merge users without duplicates by email
+    const users = [...mongoUsers];
+    const existingEmails = new Set(users.map(u => (u.email || '').toLowerCase()));
+    for (const mu of memUsers) {
+      if (!existingEmails.has((mu.email || '').toLowerCase())) {
+        const { password, ...rest } = mu;
+        users.push(rest);
+        existingEmails.add((mu.email || '').toLowerCase());
+      }
+    }
 
-    return res.status(200).json({ success: true, count: usersWithoutPassword.length, users: usersWithoutPassword });
+    return res.status(200).json({ success: true, count: users.length, users });
   } catch (error) {
     console.error('Get Users Error:', error);
     return res.status(500).json({ success: false, message: 'Server error retrieving profiles' });
@@ -67,13 +74,15 @@ const getUserById = async (req, res) => {
     const isConnected = await connectDB().catch(() => false);
     let user = null;
 
-    if (isConnected && isMongooseConnected) {
+    if (isConnected && isMongooseConnected && mongoose.Types.ObjectId.isValid(id)) {
       try {
         user = await User.findById(id).select('-password');
       } catch (dbErr) {
         user = await memDb.findUserById(id);
       }
-    } else {
+    }
+
+    if (!user) {
       user = await memDb.findUserById(id);
     }
 
@@ -83,7 +92,7 @@ const getUserById = async (req, res) => {
     }
 
     if (!user) {
-      return res.status(404).json({ success: false, message: 'Profile not found' });
+      return res.status(404).json({ success: false, message: 'User not found' });
     }
 
     return res.status(200).json({ success: true, user });
@@ -100,7 +109,7 @@ const updateProfile = async (req, res) => {
     const isConnected = await connectDB().catch(() => false);
 
     let updatedUser = null;
-    if (isConnected && isMongooseConnected) {
+    if (isConnected && isMongooseConnected && mongoose.Types.ObjectId.isValid(userId)) {
       try {
         const user = await User.findById(userId);
         if (user) {
@@ -162,5 +171,6 @@ module.exports = {
   getUserById,
   updateProfile,
 };
+
 
 

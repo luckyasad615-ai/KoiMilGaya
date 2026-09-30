@@ -16,11 +16,8 @@ class InMemoryDatabase {
     const preHashedPassword = '$2a$10$wE0v1K9J4F3g2H1j0K9L8M7N6P5Q4R3S2T1U0V1W2X3Y4Z5A6b7C8';
     for (let index = 0; index < sampleProfiles.length; index++) {
       const p = sampleProfiles[index];
-      // Generate a valid 24-hex ObjectId for sample users
-      const hexIndex = (index + 1).toString(16).padStart(6, '0');
-      const sampleId = `65a000000000000000${hexIndex}`;
       this.users.push({
-        _id: sampleId,
+        _id: p._id || `65a00000000000000000000${index + 1}`,
         ...p,
         password: preHashedPassword,
         createdAt: new Date(),
@@ -29,6 +26,7 @@ class InMemoryDatabase {
     this.initialized = true;
     console.log(`In-Memory Fallback DB Initialized with ${this.users.length} sample profiles!`);
   }
+
 
   // Users methods
   async findUsers({ search, city, gender, minAge, maxAge, excludeId }) {
