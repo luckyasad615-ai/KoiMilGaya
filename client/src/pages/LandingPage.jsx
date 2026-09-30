@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import API from '../services/api';
 import ProfileCard from '../components/ProfileCard';
 import SkeletonCard from '../components/SkeletonCard';
@@ -8,6 +9,7 @@ import { Heart, Sparkles, ShieldCheck, MapPin, Calendar, CheckCircle2, Star, Use
 const LandingPage = () => {
   const [featuredProfiles, setFeaturedProfiles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,14 +29,15 @@ const LandingPage = () => {
   }, []);
 
   return (
-    <div className="space-y-24 pb-12 bg-radial-glow overflow-hidden">
+    <div className="space-y-16 lg:space-y-24 pb-12 bg-radial-glow overflow-hidden">
       
       {/* 1. HERO SECTION */}
-      <section className="relative pt-12 lg:pt-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <section className="relative pt-6 lg:pt-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
           {/* Left Text Column */}
-          <div className="lg:col-span-7 space-y-8 text-center lg:text-left z-10">
+          <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left gap-6 z-10">
+            
             <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full glass-card border border-rose-500/30 text-rose-300 text-xs font-semibold uppercase tracking-wider animate-bounce">
               <Sparkles className="w-4 h-4 text-yellow-300" />
               <span>Koi Mil Gaya (KMG) • Global Physical & Virtual Dating</span>
@@ -45,30 +48,42 @@ const LandingPage = () => {
               <span className="text-gradient">Worth Meeting Worldwide</span>
             </h1>
 
-            <p className="text-gray-300 text-base sm:text-lg max-w-2xl font-normal leading-relaxed mx-auto lg:mx-0">
+            <p className="text-gray-300 text-base sm:text-lg max-w-2xl font-normal leading-relaxed">
               Discover attractive singles globally. Connect with verified members across USA, UK, UAE, Pakistan, Canada & Worldwide for real physical coffee dates or virtual video catchups.
             </p>
 
             {/* CTAs */}
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
-              <Link
-                to="/discover"
-                className="w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-bold btn-gradient flex items-center justify-center space-x-2 shadow-xl shadow-rose-600/30"
-              >
-                <span>Start Exploring Profiles</span>
-                <ArrowRight className="w-5 h-5" />
-              </Link>
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 w-full sm:w-auto pt-2">
+              {isAuthenticated ? (
+                <Link
+                  to="/discover"
+                  className="w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-bold btn-gradient flex items-center justify-center space-x-2 shadow-xl shadow-rose-600/30"
+                >
+                  <span>Welcome Back, {user?.fullName?.split(' ')[0]}! Explore Dashboard</span>
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    to="/discover"
+                    className="w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-bold btn-gradient flex items-center justify-center space-x-2 shadow-xl shadow-rose-600/30"
+                  >
+                    <span>Start Exploring Profiles</span>
+                    <ArrowRight className="w-5 h-5" />
+                  </Link>
 
-              <Link
-                to="/signup"
-                className="w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-semibold btn-secondary-glass flex items-center justify-center space-x-2"
-              >
-                <span>Create Free Account</span>
-              </Link>
+                  <Link
+                    to="/signup"
+                    className="w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-semibold btn-secondary-glass flex items-center justify-center space-x-2"
+                  >
+                    <span>Create Free Account</span>
+                  </Link>
+                </>
+              )}
             </div>
 
             {/* Trust highlights */}
-            <div className="pt-6 grid grid-cols-3 gap-4 border-t border-white/10 max-w-lg mx-auto lg:mx-0">
+            <div className="w-full pt-6 grid grid-cols-3 gap-4 border-t border-white/10 max-w-lg">
               <div>
                 <p className="text-xl sm:text-2xl font-bold text-white">Global</p>
                 <p className="text-xs text-gray-400">Worldwide Members</p>
@@ -82,7 +97,9 @@ const LandingPage = () => {
                 <p className="text-xs text-gray-400">USDT / BTC / Card</p>
               </div>
             </div>
+
           </div>
+
 
           {/* Right Visual Banner / Stacked Card Mockup */}
           <div className="lg:col-span-5 relative flex justify-center items-center">
