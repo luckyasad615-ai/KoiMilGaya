@@ -1,11 +1,14 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
 import User from '../models/User.js';
-import { isMongooseConnected } from '../config/db.js';
+import { connectDB, isMongooseConnected } from '../config/db.js';
 import { memDb } from '../config/memoryStore.js';
 
+const JWT_SECRET = process.env.JWT_SECRET || 'koimilgaya_super_secret_jwt_key_2026_premium_dating_app';
+
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET || 'heartsync_super_secret_jwt_key_2026_premium_dating_app', {
+  return jwt.sign({ id: id ? id.toString() : '' }, JWT_SECRET, {
     expiresIn: '30d',
   });
 };
@@ -31,9 +34,17 @@ export const registerUser = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Please enter a valid email address' });
     }
 
-    let existingUser;
-    if (isMongooseConnected) {
-      existingUser = await User.findOne({ email: email.toLowerCase() });
+    // Attempt DB connection safely
+    const isConnected = await connectDB().catch(() => false);
+
+    let existingUser = null;
+    if (isConnected && mongoose.connection.readyState === 1) {
+      try {
+        existingUser = await User.findOne({ email: email.toLowerCase() });
+      } catch (dbErr) {
+        console.warn('MongoDB findOne error, falling back to memDb:', dbErr.message);
+        existingUser = await memDb.findUserByEmail(email);
+      }
     } else {
       existingUser = await memDb.findUserByEmail(email);
     }
@@ -45,7 +56,6 @@ export const registerUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    let user;
     const userData = {
       fullName,
       email: email.toLowerCase(),
@@ -59,20 +69,27 @@ export const registerUser = async (req, res) => {
       interests: Array.isArray(interests) ? interests : (typeof interests === 'string' ? interests.split(',').map(i => i.trim()).filter(Boolean) : []),
     };
 
-    if (isMongooseConnected) {
-      user = await User.create(userData);
+    let user;
+    if (isConnected && mongoose.connection.readyState === 1) {
+      try {
+        user = await User.create(userData);
+      } catch (createErr) {
+        console.warn('MongoDB User.create error, falling back to memDb:', createErr.message);
+        user = await memDb.createUser(userData);
+      }
     } else {
       user = await memDb.createUser(userData);
     }
 
-    const token = generateToken(user._id);
+    const userIdStr = user._id ? user._id.toString() : `usr_${Date.now()}`;
+    const token = generateToken(userIdStr);
 
     return res.status(201).json({
       success: true,
       message: 'Account created successfully',
       token,
       user: {
-        _id: user._id,
+        _id: userIdStr,
         fullName: user.fullName,
         email: user.email,
         age: user.age,
@@ -99,9 +116,16 @@ export const loginUser = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Please enter email and password' });
     }
 
-    let user;
-    if (isMongooseConnected) {
-      user = await User.findOne({ email: email.toLowerCase() });
+    const isConnected = await connectDB().catch(() => false);
+
+    let user = null;
+    if (isConnected && mongoose.connection.readyState === 1) {
+      try {
+        user = await User.findOne({ email: email.toLowerCase() });
+      } catch (dbErr) {
+        console.warn('MongoDB login findOne error, falling back to memDb:', dbErr.message);
+        user = await memDb.findUserByEmail(email);
+      }
     } else {
       user = await memDb.findUserByEmail(email);
     }
@@ -115,18 +139,20 @@ export const loginUser = async (req, res) => {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
-    const token = generateToken(user._id);
+    const userIdStr = user._id ? user._id.toString() : `usr_${Date.now()}`;
+    const token = generateToken(userIdStr);
 
     return res.status(200).json({
       success: true,
       message: 'Logged in successfully',
       token,
       user: {
-        _id: user._id,
+        _id: userIdStr,
         fullName: user.fullName,
         email: user.email,
         age: user.age,
         gender: user.gender,
+        country: user.country,
         city: user.city,
         profileImage: user.profileImage,
         bio: user.bio,
@@ -150,3 +176,4 @@ export const getMe = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
+

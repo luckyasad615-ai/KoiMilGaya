@@ -16,17 +16,31 @@ const app = express();
 
 app.use(cors({
   origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/bookings', bookingRoutes);
-app.use('/api/payments', paymentRoutes);
+// Handle CORS preflight
+app.options('*', cors());
 
-app.get('/api/health', (req, res) => {
+// Routes mounted on both /api/* and direct routes for Vercel rewrite safety
+app.use('/api/auth', authRoutes);
+app.use('/auth', authRoutes);
+
+app.use('/api/users', userRoutes);
+app.use('/users', userRoutes);
+
+app.use('/api/bookings', bookingRoutes);
+app.use('/bookings', bookingRoutes);
+
+app.use('/api/payments', paymentRoutes);
+app.use('/payments', paymentRoutes);
+
+app.get(['/api/health', '/health'], (req, res) => {
   res.json({
     status: 'healthy',
     app: 'Koi Mil Gaya (KMG) API',
@@ -35,21 +49,35 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Fallback 404 Handler
+app.use((req, res) => {
+  res.status(404).json({ success: false, message: `Route ${req.originalUrl || req.url} not found` });
+});
+
+// Global Error Handler - Returns JSON instead of Vercel default 500 HTML
+app.use((err, req, res, next) => {
+  console.error('API Error:', err);
+  res.status(500).json({ success: false, message: err.message || 'Server error' });
+});
+
 let isInitialized = false;
 
 export default async function handler(req, res) {
-  try {
-    if (!isInitialized) {
+  if (!isInitialized) {
+    try {
       const isDbConnected = await connectDB();
       if (isDbConnected) {
         await seedSampleProfiles().catch((err) => console.warn('Mongoose seed warning:', err.message));
       } else {
-        await memDb.init();
+        await memDb.init().catch(() => {});
       }
+    } catch (initErr) {
+      console.error('Serverless init error:', initErr.message);
+      await memDb.init().catch(() => {});
+    } finally {
       isInitialized = true;
     }
-  } catch (initErr) {
-    console.error('Serverless init error:', initErr.message);
   }
   return app(req, res);
 }
+

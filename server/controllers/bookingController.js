@@ -1,6 +1,6 @@
 import Booking from '../models/Booking.js';
 import User from '../models/User.js';
-import { isMongooseConnected } from '../config/db.js';
+import { connectDB, isMongooseConnected } from '../config/db.js';
 import { memDb } from '../config/memoryStore.js';
 
 export const createBooking = async (req, res) => {
@@ -16,28 +16,35 @@ export const createBooking = async (req, res) => {
       return res.status(400).json({ success: false, message: 'You cannot book a meeting with yourself' });
     }
 
-    let populatedBooking;
+    const isConnected = await connectDB().catch(() => false);
+    let populatedBooking = null;
 
-    if (isMongooseConnected) {
-      const targetProfile = await User.findById(profileId);
-      if (!targetProfile) {
-        return res.status(404).json({ success: false, message: 'Profile to book not found' });
+    if (isConnected && isMongooseConnected) {
+      try {
+        const targetProfile = await User.findById(profileId);
+        if (!targetProfile) {
+          return res.status(404).json({ success: false, message: 'Profile to book not found' });
+        }
+
+        const booking = await Booking.create({
+          bookedBy,
+          profileId,
+          meetingDate,
+          meetingTime,
+          meetingLocation,
+          message: message || '',
+          amount: 499,
+          paymentStatus: 'pending',
+          bookingStatus: 'Pending',
+        });
+
+        populatedBooking = await Booking.findById(booking._id).populate('profileId', 'fullName age city profileImage email gender');
+      } catch (dbErr) {
+        console.warn('MongoDB createBooking error, falling back to memDb:', dbErr.message);
       }
+    }
 
-      const booking = await Booking.create({
-        bookedBy,
-        profileId,
-        meetingDate,
-        meetingTime,
-        meetingLocation,
-        message: message || '',
-        amount: 499,
-        paymentStatus: 'pending',
-        bookingStatus: 'Pending',
-      });
-
-      populatedBooking = await Booking.findById(booking._id).populate('profileId', 'fullName age city profileImage email gender');
-    } else {
+    if (!populatedBooking) {
       populatedBooking = await memDb.createBooking({
         bookedBy,
         profileId,
@@ -50,7 +57,7 @@ export const createBooking = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: 'Booking created! Please complete PKR 499 payment to confirm.',
+      message: 'Booking created! Please complete payment to confirm.',
       booking: populatedBooking,
     });
   } catch (error) {
@@ -61,11 +68,17 @@ export const createBooking = async (req, res) => {
 
 export const getMyBookings = async (req, res) => {
   try {
-    let bookings;
-    if (isMongooseConnected) {
-      bookings = await Booking.find({ bookedBy: req.user._id })
-        .populate('profileId', 'fullName age city profileImage email gender bio')
-        .sort({ createdAt: -1 });
+    const isConnected = await connectDB().catch(() => false);
+    let bookings = null;
+
+    if (isConnected && isMongooseConnected) {
+      try {
+        bookings = await Booking.find({ bookedBy: req.user._id })
+          .populate('profileId', 'fullName age city profileImage email gender bio')
+          .sort({ createdAt: -1 });
+      } catch (dbErr) {
+        bookings = await memDb.findBookingsByUserId(req.user._id);
+      }
     } else {
       bookings = await memDb.findBookingsByUserId(req.user._id);
     }
@@ -84,10 +97,15 @@ export const getMyBookings = async (req, res) => {
 export const getBookingById = async (req, res) => {
   try {
     const { id } = req.params;
-    let booking;
+    const isConnected = await connectDB().catch(() => false);
+    let booking = null;
 
-    if (isMongooseConnected) {
-      booking = await Booking.findById(id).populate('profileId', 'fullName age city profileImage email gender bio interests');
+    if (isConnected && isMongooseConnected) {
+      try {
+        booking = await Booking.findById(id).populate('profileId', 'fullName age city profileImage email gender bio interests');
+      } catch (dbErr) {
+        booking = await memDb.findBookingById(id);
+      }
     } else {
       booking = await memDb.findBookingById(id);
     }
@@ -106,3 +124,4 @@ export const getBookingById = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Server error fetching booking details' });
   }
 };
+
