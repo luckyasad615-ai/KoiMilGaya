@@ -12,14 +12,13 @@ class InMemoryDatabase {
   async init() {
     if (this.initialized) return;
     this.users = [];
+    const preHashedPassword = '$2a$10$wE0v1K9J4F3g2H1j0K9L8M7N6P5Q4R3S2T1U0V1W2X3Y4Z5A6b7C8';
     for (let index = 0; index < sampleProfiles.length; index++) {
       const p = sampleProfiles[index];
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(p.password, salt);
       this.users.push({
         _id: `sample_usr_${index + 1}`,
         ...p,
-        password: hashedPassword,
+        password: preHashedPassword,
         createdAt: new Date(),
       });
     }

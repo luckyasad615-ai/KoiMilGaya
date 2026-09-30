@@ -38,14 +38,18 @@ app.get('/api/health', (req, res) => {
 let isInitialized = false;
 
 export default async function handler(req, res) {
-  if (!isInitialized) {
-    const isDbConnected = await connectDB();
-    if (isDbConnected) {
-      await seedSampleProfiles().catch((err) => console.warn('Mongoose seed warning:', err.message));
-    } else {
-      await memDb.init();
+  try {
+    if (!isInitialized) {
+      const isDbConnected = await connectDB();
+      if (isDbConnected) {
+        await seedSampleProfiles().catch((err) => console.warn('Mongoose seed warning:', err.message));
+      } else {
+        await memDb.init();
+      }
+      isInitialized = true;
     }
-    isInitialized = true;
+  } catch (initErr) {
+    console.error('Serverless init error:', initErr.message);
   }
   return app(req, res);
 }
