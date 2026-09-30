@@ -1,12 +1,20 @@
+const mongoose = require('mongoose');
 const Payment = require('../models/Payment.js');
 const Booking = require('../models/Booking.js');
 const { connectDB, isMongooseConnected } = require('../config/db.js');
 const { memDb } = require('../config/memoryStore.js');
 
+const getIdStr = (val) => {
+  if (!val) return '';
+  if (typeof val === 'string') return val;
+  if (val._id) return val._id.toString();
+  return val.toString();
+};
+
 const createPayment = async (req, res) => {
   try {
     const { bookingId, paymentMethod = 'card', txHash } = req.body;
-    const userId = req.user._id;
+    const userId = getIdStr(req.user._id);
 
     if (!bookingId) {
       return res.status(400).json({ success: false, message: 'Booking ID is required for payment' });
@@ -15,13 +23,15 @@ const createPayment = async (req, res) => {
     const isConnected = await connectDB().catch(() => false);
     let booking = null;
 
-    if (isConnected && isMongooseConnected) {
+    if (isConnected && isMongooseConnected && mongoose.Types.ObjectId.isValid(bookingId)) {
       try {
         booking = await Booking.findById(bookingId);
       } catch (dbErr) {
         booking = await memDb.findBookingById(bookingId);
       }
-    } else {
+    }
+
+    if (!booking) {
       booking = await memDb.findBookingById(bookingId);
     }
 
@@ -29,7 +39,8 @@ const createPayment = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Associated booking not found' });
     }
 
-    if (booking.bookedBy.toString() !== userId.toString()) {
+    const bookingOwnerId = getIdStr(booking.bookedBy);
+    if (bookingOwnerId && userId && bookingOwnerId !== userId) {
       return res.status(403).json({ success: false, message: 'Not authorized for this payment' });
     }
 
@@ -40,7 +51,7 @@ const createPayment = async (req, res) => {
     const transactionId = `KMG-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
     let payment = null;
-    if (isConnected && isMongooseConnected) {
+    if (isConnected && isMongooseConnected && mongoose.Types.ObjectId.isValid(userId) && mongoose.Types.ObjectId.isValid(bookingId)) {
       try {
         payment = await Payment.create({
           userId,
@@ -84,7 +95,7 @@ const createPayment = async (req, res) => {
 const verifyPayment = async (req, res) => {
   try {
     const { bookingId, transactionId, simulateOutcome = 'success' } = req.body;
-    const userId = req.user._id;
+    const userId = getIdStr(req.user._id);
 
     if (!bookingId) {
       return res.status(400).json({ success: false, message: 'Booking ID is required' });
@@ -93,13 +104,15 @@ const verifyPayment = async (req, res) => {
     const isConnected = await connectDB().catch(() => false);
     let booking = null;
 
-    if (isConnected && isMongooseConnected) {
+    if (isConnected && isMongooseConnected && mongoose.Types.ObjectId.isValid(bookingId)) {
       try {
         booking = await Booking.findById(bookingId);
       } catch (dbErr) {
         booking = await memDb.findBookingById(bookingId);
       }
-    } else {
+    }
+
+    if (!booking) {
       booking = await memDb.findBookingById(bookingId);
     }
 
@@ -107,8 +120,9 @@ const verifyPayment = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Booking not found' });
     }
 
-    if (booking.bookedBy.toString() !== userId.toString()) {
-      return res.status(403).json({ success: false, message: 'Unauthorized' });
+    const bookingOwnerId = getIdStr(booking.bookedBy);
+    if (bookingOwnerId && userId && bookingOwnerId !== userId) {
+      return res.status(403).json({ success: false, message: 'Unauthorized for this payment verification' });
     }
 
     const generatedTxn = transactionId || `KMG-PAY-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -116,7 +130,7 @@ const verifyPayment = async (req, res) => {
     if (simulateOutcome === 'success') {
       let populatedBooking = null;
 
-      if (isConnected && isMongooseConnected) {
+      if (isConnected && isMongooseConnected && mongoose.Types.ObjectId.isValid(bookingId) && mongoose.Types.ObjectId.isValid(userId)) {
         try {
           let payment = await Payment.findOne({ bookingId, userId });
           if (!payment) {
@@ -159,7 +173,7 @@ const verifyPayment = async (req, res) => {
         booking: populatedBooking,
       });
     } else {
-      if (isConnected && isMongooseConnected) {
+      if (isConnected && isMongooseConnected && mongoose.Types.ObjectId.isValid(bookingId)) {
         try {
           booking.paymentStatus = 'failed';
           await booking.save();
@@ -189,4 +203,5 @@ module.exports = {
   createPayment,
   verifyPayment,
 };
+
 

@@ -1,25 +1,33 @@
+const mongoose = require('mongoose');
 const Booking = require('../models/Booking.js');
 const User = require('../models/User.js');
 const { connectDB, isMongooseConnected } = require('../config/db.js');
 const { memDb } = require('../config/memoryStore.js');
 
+const getIdStr = (val) => {
+  if (!val) return '';
+  if (typeof val === 'string') return val;
+  if (val._id) return val._id.toString();
+  return val.toString();
+};
+
 const createBooking = async (req, res) => {
   try {
     const { profileId, meetingDate, meetingTime, meetingLocation, message } = req.body;
-    const bookedBy = req.user._id;
+    const bookedBy = getIdStr(req.user._id);
 
     if (!profileId || !meetingDate || !meetingTime || !meetingLocation) {
       return res.status(400).json({ success: false, message: 'Please provide profile ID, date, time, and location' });
     }
 
-    if (profileId.toString() === bookedBy.toString()) {
+    if (getIdStr(profileId) === bookedBy) {
       return res.status(400).json({ success: false, message: 'You cannot book a meeting with yourself' });
     }
 
     const isConnected = await connectDB().catch(() => false);
     let populatedBooking = null;
 
-    if (isConnected && isMongooseConnected) {
+    if (isConnected && isMongooseConnected && mongoose.Types.ObjectId.isValid(profileId) && mongoose.Types.ObjectId.isValid(bookedBy)) {
       try {
         const targetProfile = await User.findById(profileId);
         if (!targetProfile) {
@@ -68,19 +76,22 @@ const createBooking = async (req, res) => {
 
 const getMyBookings = async (req, res) => {
   try {
+    const userId = getIdStr(req.user._id);
     const isConnected = await connectDB().catch(() => false);
     let bookings = null;
 
-    if (isConnected && isMongooseConnected) {
+    if (isConnected && isMongooseConnected && mongoose.Types.ObjectId.isValid(userId)) {
       try {
-        bookings = await Booking.find({ bookedBy: req.user._id })
+        bookings = await Booking.find({ bookedBy: userId })
           .populate('profileId', 'fullName age city profileImage email gender bio')
           .sort({ createdAt: -1 });
       } catch (dbErr) {
-        bookings = await memDb.findBookingsByUserId(req.user._id);
+        bookings = await memDb.findBookingsByUserId(userId);
       }
-    } else {
-      bookings = await memDb.findBookingsByUserId(req.user._id);
+    }
+
+    if (!bookings) {
+      bookings = await memDb.findBookingsByUserId(userId);
     }
 
     return res.status(200).json({
@@ -100,13 +111,15 @@ const getBookingById = async (req, res) => {
     const isConnected = await connectDB().catch(() => false);
     let booking = null;
 
-    if (isConnected && isMongooseConnected) {
+    if (isConnected && isMongooseConnected && mongoose.Types.ObjectId.isValid(id)) {
       try {
         booking = await Booking.findById(id).populate('profileId', 'fullName age city profileImage email gender bio interests');
       } catch (dbErr) {
         booking = await memDb.findBookingById(id);
       }
-    } else {
+    }
+
+    if (!booking) {
       booking = await memDb.findBookingById(id);
     }
 
@@ -114,8 +127,11 @@ const getBookingById = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Booking not found' });
     }
 
-    if (booking.bookedBy.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ success: false, message: 'Unauthorized access to this booking' });
+    const bookingOwnerId = getIdStr(booking.bookedBy);
+    const currentUserId = getIdStr(req.user._id);
+
+    if (bookingOwnerId && currentUserId && bookingOwnerId !== currentUserId) {
+      return res.status(403).json({ success: false, message: 'Access restricted to your own bookings' });
     }
 
     return res.status(200).json({ success: true, booking });
@@ -130,5 +146,6 @@ module.exports = {
   getMyBookings,
   getBookingById,
 };
+
 
 

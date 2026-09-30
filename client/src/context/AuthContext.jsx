@@ -56,8 +56,9 @@ export const AuthProvider = ({ children }) => {
         }
       } catch (err) {
         console.warn('Failed to verify token with server:', err.message);
-        // Only clear session if token is explicitly rejected (401/403)
-        if (err.message && (err.message.includes('Not authorized') || err.message.includes('invalid') || err.message.includes('expired'))) {
+        // Only clear session if token itself is explicitly invalid or expired
+        const msg = (err.message || '').toLowerCase();
+        if (msg.includes('token invalid') || msg.includes('token expired') || msg.includes('no token provided')) {
           clearAuthSession();
         }
       } finally {
@@ -67,6 +68,7 @@ export const AuthProvider = ({ children }) => {
 
     fetchCurrentUser();
   }, [token]);
+
 
   const login = async (email, password) => {
     const response = await API.post('/auth/login', { email, password });
