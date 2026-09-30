@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const User = require('../models/User.js');
 const { connectDB, isMongooseConnected } = require('../config/db.js');
 const { memDb } = require('../config/memoryStore.js');
+const { sampleProfiles } = require('../seed/sampleData.js');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'koimilgaya_super_secret_jwt_key_2026_premium_dating_app';
 
@@ -29,13 +30,21 @@ const protect = async (req, res, next) => {
         user = await memDb.findUserById(decoded.id);
       }
 
+      if (!user) {
+        const sampleMatch = sampleProfiles.find(p => p._id === decoded.id || (p.email && p.email.toLowerCase() === decoded.id.toLowerCase()));
+        if (sampleMatch) {
+          const { password, ...rest } = sampleMatch;
+          user = rest;
+        }
+      }
+
       if (user && user.password) {
         const { password, ...userWithoutPassword } = user.toObject ? user.toObject() : user;
         user = userWithoutPassword;
       }
 
       if (!user) {
-        return res.status(401).json({ success: false, message: 'User not found' });
+        return res.status(401).json({ success: false, message: 'Session expired or user account not found. Please log in again.' });
       }
 
       req.user = user;

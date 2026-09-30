@@ -3,6 +3,7 @@ const Booking = require('../models/Booking.js');
 const User = require('../models/User.js');
 const { connectDB, isMongooseConnected } = require('../config/db.js');
 const { memDb } = require('../config/memoryStore.js');
+const { sampleProfiles } = require('../seed/sampleData.js');
 
 const getIdStr = (val) => {
   if (!val) return '';
@@ -37,6 +38,13 @@ const createBooking = async (req, res) => {
 
     if (!targetProfile) {
       targetProfile = await memDb.findUserById(profileId);
+    }
+
+    if (!targetProfile) {
+      const match = sampleProfiles.find(p => p._id === profileId || (p.email && p.email.toLowerCase() === profileId.toLowerCase()));
+      if (match) {
+        targetProfile = match;
+      }
     }
 
     if (!targetProfile) {

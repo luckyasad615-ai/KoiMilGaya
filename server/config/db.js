@@ -17,7 +17,8 @@ const connectDB = async () => {
 
   if (!cached.promise) {
     const opts = {
-      serverSelectionTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 10000,
+      connectTimeoutMS: 10000,
     };
     cached.promise = mongoose.connect(uri, opts).then((m) => {
       isMongooseConnected = true;

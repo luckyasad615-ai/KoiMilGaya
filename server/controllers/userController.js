@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const User = require('../models/User.js');
 const { connectDB, isMongooseConnected } = require('../config/db.js');
 const { memDb } = require('../config/memoryStore.js');
+const { sampleProfiles } = require('../seed/sampleData.js');
 
 const getAllUsers = async (req, res) => {
   try {
@@ -42,6 +43,18 @@ const getAllUsers = async (req, res) => {
         if (idStr) seenIds.add(idStr);
         if (emailLower) seenEmails.add(emailLower);
         const { password, ...rest } = mem;
+        combined.push(rest);
+      }
+    }
+
+    // Always append fallback sample profiles if not already present
+    for (const sp of sampleProfiles) {
+      const idStr = sp._id;
+      const emailLower = (sp.email || '').toLowerCase();
+      if (!seenIds.has(idStr) && !seenEmails.has(emailLower)) {
+        seenIds.add(idStr);
+        seenEmails.add(emailLower);
+        const { password, ...rest } = sp;
         combined.push(rest);
       }
     }
@@ -122,6 +135,14 @@ const getUserById = async (req, res) => {
 
     if (!user) {
       user = await memDb.findUserByEmail(id);
+    }
+
+    if (!user) {
+      const match = sampleProfiles.find(p => p._id === id || (p.email && p.email.toLowerCase() === id.toLowerCase()));
+      if (match) {
+        const { password, ...rest } = match;
+        user = rest;
+      }
     }
 
     if (!user) {
