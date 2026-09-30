@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 const User = require('../models/User.js');
 const { connectDB, isMongooseConnected } = require('../config/db.js');
 const { memDb } = require('../config/memoryStore.js');
@@ -16,13 +17,15 @@ const protect = async (req, res, next) => {
       const isConnected = await connectDB().catch(() => false);
 
       let user = null;
-      if (isConnected && isMongooseConnected) {
+      if (isConnected && isMongooseConnected && mongoose.Types.ObjectId.isValid(decoded.id)) {
         try {
           user = await User.findById(decoded.id).select('-password');
         } catch (dbErr) {
           user = await memDb.findUserById(decoded.id);
         }
-      } else {
+      }
+
+      if (!user) {
         user = await memDb.findUserById(decoded.id);
       }
 
@@ -47,5 +50,6 @@ const protect = async (req, res, next) => {
 };
 
 module.exports = { protect };
+
 
 

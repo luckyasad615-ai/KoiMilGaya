@@ -3,12 +3,46 @@ import API from '../services/api';
 
 const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('heartsync_token') || null);
-  const [loading, setLoading] = useState(true);
+const getInitialUser = () => {
+  try {
+    const cached = localStorage.getItem('kmg_user');
+    return cached ? JSON.parse(cached) : null;
+  } catch (err) {
+    return null;
+  }
+};
 
-  // Load profile on initial load if token exists
+const getInitialToken = () => {
+  return localStorage.getItem('kmg_auth_token') || localStorage.getItem('heartsync_token') || null;
+};
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(getInitialUser());
+  const [token, setToken] = useState(getInitialToken());
+  const [loading, setLoading] = useState(!user);
+
+  // Synchronize state to localStorage helper
+  const saveAuthSession = (newToken, newUser) => {
+    if (newToken) {
+      localStorage.setItem('kmg_auth_token', newToken);
+      localStorage.setItem('heartsync_token', newToken);
+      setToken(newToken);
+    }
+    if (newUser) {
+      localStorage.setItem('kmg_user', JSON.stringify(newUser));
+      setUser(newUser);
+    }
+  };
+
+  const clearAuthSession = () => {
+    localStorage.removeItem('kmg_auth_token');
+    localStorage.removeItem('heartsync_token');
+    localStorage.removeItem('kmg_user');
+    setToken(null);
+    setUser(null);
+  };
+
+  // Verify and sync profile with server
   useEffect(() => {
     const fetchCurrentUser = async () => {
       if (!token) {
@@ -17,14 +51,15 @@ export const AuthProvider = ({ children }) => {
       }
       try {
         const response = await API.get('/auth/me');
-        if (response.success) {
-          setUser(response.user);
+        if (response.success && response.user) {
+          saveAuthSession(null, response.user);
         }
       } catch (err) {
-        console.warn('Failed to verify token:', err.message);
-        localStorage.removeItem('heartsync_token');
-        setToken(null);
-        setUser(null);
+        console.warn('Failed to verify token with server:', err.message);
+        // Only clear session if token is explicitly rejected (401/403)
+        if (err.message && (err.message.includes('Not authorized') || err.message.includes('invalid') || err.message.includes('expired'))) {
+          clearAuthSession();
+        }
       } finally {
         setLoading(false);
       }
@@ -35,34 +70,28 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     const response = await API.post('/auth/login', { email, password });
-    if (response.success) {
-      localStorage.setItem('heartsync_token', response.token);
-      setToken(response.token);
-      setUser(response.user);
+    if (response.success && response.token && response.user) {
+      saveAuthSession(response.token, response.user);
     }
     return response;
   };
 
   const signup = async (formData) => {
     const response = await API.post('/auth/register', formData);
-    if (response.success) {
-      localStorage.setItem('heartsync_token', response.token);
-      setToken(response.token);
-      setUser(response.user);
+    if (response.success && response.token && response.user) {
+      saveAuthSession(response.token, response.user);
     }
     return response;
   };
 
   const logout = () => {
-    localStorage.removeItem('heartsync_token');
-    setToken(null);
-    setUser(null);
+    clearAuthSession();
   };
 
   const updateUserProfile = async (updatedData) => {
     const response = await API.put('/users/profile', updatedData);
-    if (response.success) {
-      setUser(response.user);
+    if (response.success && response.user) {
+      saveAuthSession(null, response.user);
     }
     return response;
   };
@@ -77,13 +106,14 @@ export const AuthProvider = ({ children }) => {
         signup,
         logout,
         updateUserProfile,
-        isAuthenticated: !!user,
+        isAuthenticated: !!user || !!token,
       }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
+
 
 export const useAuth = () => {
   const context = useContext(AuthContext);

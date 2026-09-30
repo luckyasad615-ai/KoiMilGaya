@@ -9,7 +9,7 @@ const API = axios.create({
 
 // Attach Authorization Token to requests automatically
 API.interceptors.request.use((config) => {
-  const token = localStorage.getItem('heartsync_token');
+  const token = localStorage.getItem('kmg_auth_token') || localStorage.getItem('heartsync_token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -17,6 +17,7 @@ API.interceptors.request.use((config) => {
 }, (error) => {
   return Promise.reject(error);
 });
+
 
 // Extract data or handle standard errors
 API.interceptors.response.use(

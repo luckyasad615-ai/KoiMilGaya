@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const mongoose = require('mongoose');
 const { sampleProfiles } = require('../seed/sampleData.js');
 
 class InMemoryDatabase {
@@ -15,8 +16,11 @@ class InMemoryDatabase {
     const preHashedPassword = '$2a$10$wE0v1K9J4F3g2H1j0K9L8M7N6P5Q4R3S2T1U0V1W2X3Y4Z5A6b7C8';
     for (let index = 0; index < sampleProfiles.length; index++) {
       const p = sampleProfiles[index];
+      // Generate a valid 24-hex ObjectId for sample users
+      const hexIndex = (index + 1).toString(16).padStart(6, '0');
+      const sampleId = `65a000000000000000${hexIndex}`;
       this.users.push({
-        _id: `sample_usr_${index + 1}`,
+        _id: sampleId,
         ...p,
         password: preHashedPassword,
         createdAt: new Date(),
@@ -61,7 +65,7 @@ class InMemoryDatabase {
   async createUser(userData) {
     await this.init();
     const newUser = {
-      _id: `usr_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+      _id: new mongoose.Types.ObjectId().toString(),
       ...userData,
       createdAt: new Date(),
     };
@@ -82,7 +86,7 @@ class InMemoryDatabase {
     await this.init();
     const targetProfile = await this.findUserById(bookingData.profileId);
     const newBooking = {
-      _id: `bk_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+      _id: new mongoose.Types.ObjectId().toString(),
       ...bookingData,
       amount: 499,
       paymentStatus: 'pending',
@@ -124,7 +128,7 @@ class InMemoryDatabase {
   async createPayment(paymentData) {
     await this.init();
     const newPayment = {
-      _id: `pay_${Date.now()}`,
+      _id: new mongoose.Types.ObjectId().toString(),
       ...paymentData,
       createdAt: new Date(),
     };
@@ -135,4 +139,5 @@ class InMemoryDatabase {
 
 const memDb = new InMemoryDatabase();
 module.exports = { memDb };
+
 
