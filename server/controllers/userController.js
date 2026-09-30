@@ -11,55 +11,84 @@ const getAllUsers = async (req, res) => {
     let mongoUsers = [];
     if (isConnected && isMongooseConnected) {
       try {
-        let query = {};
-        if (req.user) {
-          query._id = { $ne: req.user._id };
-        }
-        if (search) {
-          query.$or = [
-            { fullName: { $regex: search, $options: 'i' } },
-            { bio: { $regex: search, $options: 'i' } },
-            { interests: { $regex: search, $options: 'i' } },
-          ];
-        }
-        if (city && city !== 'All') {
-          query.city = { $regex: `^${city}$`, $options: 'i' };
-        }
-        if (gender && gender !== 'All') {
-          query.gender = gender;
-        }
-        if (minAge || maxAge) {
-          query.age = {};
-          if (minAge) query.age.$gte = Number(minAge);
-          if (maxAge) query.age.$lte = Number(maxAge);
-        }
-
-        const found = await User.find(query).select('-password').sort({ createdAt: -1 });
+        const found = await User.find({}).select('-password').sort({ createdAt: -1 });
         mongoUsers = found.map(u => (u.toObject ? u.toObject() : u));
       } catch (dbErr) {
         console.warn('MongoDB getAllUsers error, falling back to memDb:', dbErr.message);
       }
     }
 
-    const memUsers = await memDb.findUsers({
-      search,
-      city,
-      gender,
-      minAge,
-      maxAge,
-      excludeId: req.user?._id,
-    });
+    const memUsers = await memDb.findUsers({});
 
-    // Merge users without duplicates by email
-    const users = [...mongoUsers];
-    const existingEmails = new Set(users.map(u => (u.email || '').toLowerCase()));
-    for (const mu of memUsers) {
-      if (!existingEmails.has((mu.email || '').toLowerCase())) {
-        const { password, ...rest } = mu;
-        users.push(rest);
-        existingEmails.add((mu.email || '').toLowerCase());
+    // Merge users without duplicates by email and _id
+    const combined = [];
+    const seenIds = new Set();
+    const seenEmails = new Set();
+
+    for (const mu of mongoUsers) {
+      const idStr = mu._id ? mu._id.toString() : '';
+      const emailLower = (mu.email || '').toLowerCase();
+      if (idStr && !seenIds.has(idStr) && !seenEmails.has(emailLower)) {
+        seenIds.add(idStr);
+        if (emailLower) seenEmails.add(emailLower);
+        combined.push(mu);
       }
     }
+
+    for (const mem of memUsers) {
+      const idStr = mem._id ? mem._id.toString() : '';
+      const emailLower = (mem.email || '').toLowerCase();
+      if (!seenIds.has(idStr) && (!emailLower || !seenEmails.has(emailLower))) {
+        if (idStr) seenIds.add(idStr);
+        if (emailLower) seenEmails.add(emailLower);
+        const { password, ...rest } = mem;
+        combined.push(rest);
+      }
+    }
+
+    const currentUserIdStr = req.user ? (req.user._id ? req.user._id.toString() : req.user.toString()) : '';
+
+    const users = combined.filter((u) => {
+      const uId = u._id ? u._id.toString() : '';
+      // Exclude logged in user from discover list so they don't see themselves
+      if (currentUserIdStr && uId === currentUserIdStr) {
+        return false;
+      }
+
+      if (search && search.trim()) {
+        const s = search.trim().toLowerCase();
+        const matchesName = (u.fullName || '').toLowerCase().includes(s);
+        const matchesBio = (u.bio || '').toLowerCase().includes(s);
+        const matchesCity = (u.city || '').toLowerCase().includes(s);
+        const matchesCountry = (u.country || '').toLowerCase().includes(s);
+        const matchesInterests = Array.isArray(u.interests) && u.interests.some(i => i.toLowerCase().includes(s));
+        if (!matchesName && !matchesBio && !matchesCity && !matchesCountry && !matchesInterests) {
+          return false;
+        }
+      }
+
+      if (city && city !== 'All') {
+        if (!(u.city || '').toLowerCase().includes(city.toLowerCase())) {
+          return false;
+        }
+      }
+
+      if (gender && gender !== 'All') {
+        if (u.gender !== gender) {
+          return false;
+        }
+      }
+
+      if (minAge && u.age < Number(minAge)) {
+        return false;
+      }
+
+      if (maxAge && u.age > Number(maxAge)) {
+        return false;
+      }
+
+      return true;
+    });
 
     return res.status(200).json({ success: true, count: users.length, users });
   } catch (error) {
@@ -74,11 +103,16 @@ const getUserById = async (req, res) => {
     const isConnected = await connectDB().catch(() => false);
     let user = null;
 
-    if (isConnected && isMongooseConnected && mongoose.Types.ObjectId.isValid(id)) {
+    if (isConnected && isMongooseConnected) {
       try {
-        user = await User.findById(id).select('-password');
+        if (mongoose.Types.ObjectId.isValid(id)) {
+          user = await User.findById(id).select('-password');
+        }
+        if (!user) {
+          user = await User.findOne({ email: id.toLowerCase() }).select('-password');
+        }
       } catch (dbErr) {
-        user = await memDb.findUserById(id);
+        console.warn('MongoDB getUserById error:', dbErr.message);
       }
     }
 
@@ -86,13 +120,17 @@ const getUserById = async (req, res) => {
       user = await memDb.findUserById(id);
     }
 
-    if (user && user.password) {
-      const { password, ...rest } = user.toObject ? user.toObject() : user;
-      user = rest;
+    if (!user) {
+      user = await memDb.findUserByEmail(id);
     }
 
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (user && user.password) {
+      const { password, ...rest } = user.toObject ? user.toObject() : user;
+      user = rest;
     }
 
     return res.status(200).json({ success: true, user });

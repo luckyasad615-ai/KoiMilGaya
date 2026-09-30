@@ -25,15 +25,28 @@ const createBooking = async (req, res) => {
     }
 
     const isConnected = await connectDB().catch(() => false);
+    let targetProfile = null;
+
+    if (isConnected && isMongooseConnected && mongoose.Types.ObjectId.isValid(profileId)) {
+      try {
+        targetProfile = await User.findById(profileId);
+      } catch (dbErr) {
+        targetProfile = await memDb.findUserById(profileId);
+      }
+    }
+
+    if (!targetProfile) {
+      targetProfile = await memDb.findUserById(profileId);
+    }
+
+    if (!targetProfile) {
+      return res.status(404).json({ success: false, message: 'Profile to book not found' });
+    }
+
     let populatedBooking = null;
 
     if (isConnected && isMongooseConnected && mongoose.Types.ObjectId.isValid(profileId) && mongoose.Types.ObjectId.isValid(bookedBy)) {
       try {
-        const targetProfile = await User.findById(profileId);
-        if (!targetProfile) {
-          return res.status(404).json({ success: false, message: 'Profile to book not found' });
-        }
-
         const booking = await Booking.create({
           bookedBy,
           profileId,

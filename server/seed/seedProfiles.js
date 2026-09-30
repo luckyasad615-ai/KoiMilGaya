@@ -8,26 +8,21 @@ dotenv.config();
 
 const seedSampleProfiles = async () => {
   try {
-    const existingCount = await User.countDocuments({ isSample: true });
-    if (existingCount > 0) {
-      console.log(`Sample profiles already present in DB (${existingCount} found). Skipping auto-seed.`);
-      return;
-    }
-
-    console.log('Seeding initial sample profiles...');
-    const hashedProfiles = await Promise.all(
-      sampleProfiles.map(async (profile) => {
+    console.log('Verifying and seeding sample profiles into MongoDB...');
+    for (const profile of sampleProfiles) {
+      const objId = new mongoose.Types.ObjectId(profile._id);
+      const existing = await User.findById(objId);
+      if (!existing) {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(profile.password, salt);
-        return {
+        await User.create({
           ...profile,
+          _id: objId,
           password: hashedPassword,
-        };
-      })
-    );
-
-    await User.insertMany(hashedProfiles);
-    console.log('Sample profiles successfully seeded into MongoDB!');
+        });
+      }
+    }
+    console.log('Sample profiles successfully verified/seeded into MongoDB!');
   } catch (error) {
     console.error('Error seeding profiles:', error.message);
   }

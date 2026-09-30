@@ -73,6 +73,7 @@ const registerUser = async (req, res) => {
     if (isConnected && mongoose.connection.readyState === 1) {
       try {
         user = await User.create(userData);
+        await memDb.createUser({ ...userData, _id: user._id.toString() }).catch(() => {});
       } catch (createErr) {
         console.warn('MongoDB User.create error, falling back to memDb:', createErr.message);
         user = await memDb.createUser(userData);
