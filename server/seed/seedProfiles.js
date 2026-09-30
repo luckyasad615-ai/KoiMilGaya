@@ -1,12 +1,12 @@
-import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
-import dotenv from 'dotenv';
-import User from '../models/User.js';
-import { sampleProfiles } from './sampleData.js';
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const dotenv = require('dotenv');
+const User = require('../models/User.js');
+const { sampleProfiles } = require('./sampleData.js');
 
 dotenv.config();
 
-export const seedSampleProfiles = async () => {
+const seedSampleProfiles = async () => {
   try {
     const existingCount = await User.countDocuments({ isSample: true });
     if (existingCount > 0) {
@@ -51,3 +51,6 @@ if (process.argv[1]?.includes('seedProfiles.js')) {
   };
   runDirectSeed();
 }
+
+module.exports = { seedSampleProfiles };
+

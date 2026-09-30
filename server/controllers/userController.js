@@ -1,9 +1,9 @@
-import mongoose from 'mongoose';
-import User from '../models/User.js';
-import { connectDB, isMongooseConnected } from '../config/db.js';
-import { memDb } from '../config/memoryStore.js';
+const mongoose = require('mongoose');
+const User = require('../models/User.js');
+const { connectDB, isMongooseConnected } = require('../config/db.js');
+const { memDb } = require('../config/memoryStore.js');
 
-export const getAllUsers = async (req, res) => {
+const getAllUsers = async (req, res) => {
   try {
     const { search, city, gender, minAge, maxAge } = req.query;
     const isConnected = await connectDB().catch(() => false);
@@ -61,7 +61,7 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
-export const getUserById = async (req, res) => {
+const getUserById = async (req, res) => {
   try {
     const { id } = req.params;
     const isConnected = await connectDB().catch(() => false);
@@ -93,7 +93,7 @@ export const getUserById = async (req, res) => {
   }
 };
 
-export const updateProfile = async (req, res) => {
+const updateProfile = async (req, res) => {
   try {
     const userId = req.user._id;
     const { fullName, age, gender, city, profileImage, bio, interests } = req.body;
@@ -156,4 +156,11 @@ export const updateProfile = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Server error updating profile' });
   }
 };
+
+module.exports = {
+  getAllUsers,
+  getUserById,
+  updateProfile,
+};
+
 

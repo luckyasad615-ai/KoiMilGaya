@@ -1,9 +1,9 @@
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import mongoose from 'mongoose';
-import User from '../models/User.js';
-import { connectDB, isMongooseConnected } from '../config/db.js';
-import { memDb } from '../config/memoryStore.js';
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
+const User = require('../models/User.js');
+const { connectDB, isMongooseConnected } = require('../config/db.js');
+const { memDb } = require('../config/memoryStore.js');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'koimilgaya_super_secret_jwt_key_2026_premium_dating_app';
 
@@ -13,7 +13,7 @@ const generateToken = (id) => {
   });
 };
 
-export const registerUser = async (req, res) => {
+const registerUser = async (req, res) => {
   try {
     const { fullName, email, password, confirmPassword, age, gender, country, city, profileImage, bio, interests } = req.body;
 
@@ -108,7 +108,7 @@ export const registerUser = async (req, res) => {
   }
 };
 
-export const loginUser = async (req, res) => {
+const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -166,7 +166,7 @@ export const loginUser = async (req, res) => {
   }
 };
 
-export const getMe = async (req, res) => {
+const getMe = async (req, res) => {
   try {
     return res.status(200).json({
       success: true,
@@ -176,4 +176,11 @@ export const getMe = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Server error' });
   }
 };
+
+module.exports = {
+  registerUser,
+  loginUser,
+  getMe,
+};
+
 

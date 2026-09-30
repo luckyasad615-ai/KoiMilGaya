@@ -1,4 +1,4 @@
-export const sampleProfiles = [
+const sampleProfiles = [
   {
     fullName: "Ayesha Malik",
     email: "ayesha.malik@example.com",
@@ -104,3 +104,6 @@ export const sampleProfiles = [
     isSample: true
   }
 ];
+
+module.exports = { sampleProfiles };
+

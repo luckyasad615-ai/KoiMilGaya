@@ -1,11 +1,11 @@
-import jwt from 'jsonwebtoken';
-import User from '../models/User.js';
-import { connectDB, isMongooseConnected } from '../config/db.js';
-import { memDb } from '../config/memoryStore.js';
+const jwt = require('jsonwebtoken');
+const User = require('../models/User.js');
+const { connectDB, isMongooseConnected } = require('../config/db.js');
+const { memDb } = require('../config/memoryStore.js');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'koimilgaya_super_secret_jwt_key_2026_premium_dating_app';
 
-export const protect = async (req, res, next) => {
+const protect = async (req, res, next) => {
   let token;
 
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
@@ -45,4 +45,7 @@ export const protect = async (req, res, next) => {
     return res.status(401).json({ success: false, message: 'Not authorized, no token provided' });
   }
 };
+
+module.exports = { protect };
+
 

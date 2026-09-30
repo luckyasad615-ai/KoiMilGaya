@@ -1,14 +1,14 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import { connectDB, isMongooseConnected } from '../server/config/db.js';
-import { seedSampleProfiles } from '../server/seed/seedProfiles.js';
-import { memDb } from '../server/config/memoryStore.js';
+const express = require('express');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const { connectDB, isMongooseConnected } = require('../server/config/db.js');
+const { seedSampleProfiles } = require('../server/seed/seedProfiles.js');
+const { memDb } = require('../server/config/memoryStore.js');
 
-import authRoutes from '../server/routes/authRoutes.js';
-import userRoutes from '../server/routes/userRoutes.js';
-import bookingRoutes from '../server/routes/bookingRoutes.js';
-import paymentRoutes from '../server/routes/paymentRoutes.js';
+const authRoutes = require('../server/routes/authRoutes.js');
+const userRoutes = require('../server/routes/userRoutes.js');
+const bookingRoutes = require('../server/routes/bookingRoutes.js');
+const paymentRoutes = require('../server/routes/paymentRoutes.js');
 
 dotenv.config();
 
@@ -62,7 +62,7 @@ app.use((err, req, res, next) => {
 
 let isInitialized = false;
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (!isInitialized) {
     try {
       const isDbConnected = await connectDB();
@@ -79,5 +79,6 @@ export default async function handler(req, res) {
     }
   }
   return app(req, res);
-}
+};
+
 

@@ -1,13 +1,13 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
-export let isMongooseConnected = false;
+let isMongooseConnected = false;
 
 let cached = global.mongoose;
 if (!cached) {
   cached = global.mongoose = { conn: null, promise: null };
 }
 
-export const connectDB = async () => {
+const connectDB = async () => {
   const uri = process.env.MONGO_URI || 'mongodb+srv://dating:OdtSvEp9hv7I8GTB@cluster1.mafyefw.mongodb.net/koimilgaya?retryWrites=true&w=majority';
 
   if (cached.conn && mongoose.connection.readyState === 1) {
@@ -17,7 +17,7 @@ export const connectDB = async () => {
 
   if (!cached.promise) {
     const opts = {
-      serverSelectionTimeoutMS: 10000,
+      serverSelectionTimeoutMS: 5000,
     };
     cached.promise = mongoose.connect(uri, opts).then((m) => {
       isMongooseConnected = true;
@@ -41,3 +41,9 @@ export const connectDB = async () => {
     return false;
   }
 };
+
+module.exports = {
+  connectDB,
+  get isMongooseConnected() { return isMongooseConnected; }
+};
+

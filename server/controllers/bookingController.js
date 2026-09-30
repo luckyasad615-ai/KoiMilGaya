@@ -1,9 +1,9 @@
-import Booking from '../models/Booking.js';
-import User from '../models/User.js';
-import { connectDB, isMongooseConnected } from '../config/db.js';
-import { memDb } from '../config/memoryStore.js';
+const Booking = require('../models/Booking.js');
+const User = require('../models/User.js');
+const { connectDB, isMongooseConnected } = require('../config/db.js');
+const { memDb } = require('../config/memoryStore.js');
 
-export const createBooking = async (req, res) => {
+const createBooking = async (req, res) => {
   try {
     const { profileId, meetingDate, meetingTime, meetingLocation, message } = req.body;
     const bookedBy = req.user._id;
@@ -66,7 +66,7 @@ export const createBooking = async (req, res) => {
   }
 };
 
-export const getMyBookings = async (req, res) => {
+const getMyBookings = async (req, res) => {
   try {
     const isConnected = await connectDB().catch(() => false);
     let bookings = null;
@@ -94,7 +94,7 @@ export const getMyBookings = async (req, res) => {
   }
 };
 
-export const getBookingById = async (req, res) => {
+const getBookingById = async (req, res) => {
   try {
     const { id } = req.params;
     const isConnected = await connectDB().catch(() => false);
@@ -124,4 +124,11 @@ export const getBookingById = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Server error fetching booking details' });
   }
 };
+
+module.exports = {
+  createBooking,
+  getMyBookings,
+  getBookingById,
+};
+
 

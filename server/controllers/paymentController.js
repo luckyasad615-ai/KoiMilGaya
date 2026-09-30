@@ -1,9 +1,9 @@
-import Payment from '../models/Payment.js';
-import Booking from '../models/Booking.js';
-import { isMongooseConnected } from '../config/db.js';
-import { memDb } from '../config/memoryStore.js';
+const Payment = require('../models/Payment.js');
+const Booking = require('../models/Booking.js');
+const { connectDB, isMongooseConnected } = require('../config/db.js');
+const { memDb } = require('../config/memoryStore.js');
 
-export const createPayment = async (req, res) => {
+const createPayment = async (req, res) => {
   try {
     const { bookingId, paymentMethod = 'card', txHash } = req.body;
     const userId = req.user._id;
@@ -12,9 +12,15 @@ export const createPayment = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Booking ID is required for payment' });
     }
 
-    let booking;
-    if (isMongooseConnected) {
-      booking = await Booking.findById(bookingId);
+    const isConnected = await connectDB().catch(() => false);
+    let booking = null;
+
+    if (isConnected && isMongooseConnected) {
+      try {
+        booking = await Booking.findById(bookingId);
+      } catch (dbErr) {
+        booking = await memDb.findBookingById(bookingId);
+      }
     } else {
       booking = await memDb.findBookingById(bookingId);
     }
@@ -33,18 +39,24 @@ export const createPayment = async (req, res) => {
 
     const transactionId = `KMG-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
-    let payment;
-    if (isMongooseConnected) {
-      payment = await Payment.create({
-        userId,
-        bookingId,
-        amount: 499,
-        paymentMethod,
-        txHash: txHash || '',
-        transactionId,
-        status: 'pending',
-      });
-    } else {
+    let payment = null;
+    if (isConnected && isMongooseConnected) {
+      try {
+        payment = await Payment.create({
+          userId,
+          bookingId,
+          amount: 499,
+          paymentMethod,
+          txHash: txHash || '',
+          transactionId,
+          status: 'pending',
+        });
+      } catch (dbErr) {
+        console.warn('MongoDB createPayment error, falling back to memDb:', dbErr.message);
+      }
+    }
+
+    if (!payment) {
       payment = await memDb.createPayment({
         userId,
         bookingId,
@@ -69,7 +81,7 @@ export const createPayment = async (req, res) => {
   }
 };
 
-export const verifyPayment = async (req, res) => {
+const verifyPayment = async (req, res) => {
   try {
     const { bookingId, transactionId, simulateOutcome = 'success' } = req.body;
     const userId = req.user._id;
@@ -78,9 +90,15 @@ export const verifyPayment = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Booking ID is required' });
     }
 
-    let booking;
-    if (isMongooseConnected) {
-      booking = await Booking.findById(bookingId);
+    const isConnected = await connectDB().catch(() => false);
+    let booking = null;
+
+    if (isConnected && isMongooseConnected) {
+      try {
+        booking = await Booking.findById(bookingId);
+      } catch (dbErr) {
+        booking = await memDb.findBookingById(bookingId);
+      }
     } else {
       booking = await memDb.findBookingById(bookingId);
     }
@@ -96,30 +114,36 @@ export const verifyPayment = async (req, res) => {
     const generatedTxn = transactionId || `KMG-PAY-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
     if (simulateOutcome === 'success') {
-      let populatedBooking;
+      let populatedBooking = null;
 
-      if (isMongooseConnected) {
-        let payment = await Payment.findOne({ bookingId, userId });
-        if (!payment) {
-          payment = await Payment.create({
-            userId,
-            bookingId,
-            amount: 499,
-            paymentMethod: 'test_sandbox',
-            transactionId: generatedTxn,
-            status: 'paid',
-          });
-        } else {
-          payment.status = 'paid';
-          await payment.save();
+      if (isConnected && isMongooseConnected) {
+        try {
+          let payment = await Payment.findOne({ bookingId, userId });
+          if (!payment) {
+            payment = await Payment.create({
+              userId,
+              bookingId,
+              amount: 499,
+              paymentMethod: 'test_sandbox',
+              transactionId: generatedTxn,
+              status: 'paid',
+            });
+          } else {
+            payment.status = 'paid';
+            await payment.save();
+          }
+
+          booking.paymentStatus = 'paid';
+          booking.bookingStatus = 'Confirmed';
+          await booking.save();
+
+          populatedBooking = await Booking.findById(booking._id).populate('profileId', 'fullName age city profileImage email gender');
+        } catch (dbErr) {
+          console.warn('MongoDB verifyPayment error, falling back to memDb:', dbErr.message);
         }
+      }
 
-        booking.paymentStatus = 'paid';
-        booking.bookingStatus = 'Confirmed';
-        await booking.save();
-
-        populatedBooking = await Booking.findById(booking._id).populate('profileId', 'fullName age city profileImage email gender');
-      } else {
+      if (!populatedBooking) {
         populatedBooking = await memDb.updateBooking(bookingId, {
           paymentStatus: 'paid',
           bookingStatus: 'Confirmed',
@@ -135,9 +159,13 @@ export const verifyPayment = async (req, res) => {
         booking: populatedBooking,
       });
     } else {
-      if (isMongooseConnected) {
-        booking.paymentStatus = 'failed';
-        await booking.save();
+      if (isConnected && isMongooseConnected) {
+        try {
+          booking.paymentStatus = 'failed';
+          await booking.save();
+        } catch (dbErr) {
+          await memDb.updateBooking(bookingId, { paymentStatus: 'failed' });
+        }
       } else {
         await memDb.updateBooking(bookingId, {
           paymentStatus: 'failed',
@@ -156,3 +184,9 @@ export const verifyPayment = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Server error verifying payment' });
   }
 };
+
+module.exports = {
+  createPayment,
+  verifyPayment,
+};
+

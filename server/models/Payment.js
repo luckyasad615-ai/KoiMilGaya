@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const paymentSchema = new mongoose.Schema({
   userId: {
@@ -41,4 +41,5 @@ const paymentSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.models.Payment || mongoose.model('Payment', paymentSchema);
+module.exports = mongoose.models.Payment || mongoose.model('Payment', paymentSchema);
+

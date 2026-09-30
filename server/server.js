@@ -1,14 +1,14 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import { connectDB, isMongooseConnected } from './config/db.js';
-import { seedSampleProfiles } from './seed/seedProfiles.js';
-import { memDb } from './config/memoryStore.js';
+const express = require('express');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const { connectDB, isMongooseConnected } = require('./config/db.js');
+const { seedSampleProfiles } = require('./seed/seedProfiles.js');
+const { memDb } = require('./config/memoryStore.js');
 
-import authRoutes from './routes/authRoutes.js';
-import userRoutes from './routes/userRoutes.js';
-import bookingRoutes from './routes/bookingRoutes.js';
-import paymentRoutes from './routes/paymentRoutes.js';
+const authRoutes = require('./routes/authRoutes.js');
+const userRoutes = require('./routes/userRoutes.js');
+const bookingRoutes = require('./routes/bookingRoutes.js');
+const paymentRoutes = require('./routes/paymentRoutes.js');
 
 dotenv.config();
 
@@ -33,7 +33,7 @@ app.use('/api/payments', paymentRoutes);
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'healthy',
-    app: 'HeartSync API',
+    app: 'Koi Mil Gaya (KMG) API',
     database: isMongooseConnected ? 'MongoDB' : 'In-Memory Store',
     timestamp: new Date().toISOString()
   });
@@ -56,7 +56,7 @@ const startServer = async () => {
   }
 
   const server = app.listen(PORT, () => {
-    console.log(`HeartSync Server running cleanly on http://localhost:${PORT}`);
+    console.log(`Koi Mil Gaya (KMG) Server running cleanly on http://localhost:${PORT}`);
   });
 
   server.on('error', (err) => {
@@ -69,3 +69,4 @@ const startServer = async () => {
 };
 
 startServer();
+

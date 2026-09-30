@@ -1,6 +1,6 @@
-import express from 'express';
-import { createPayment, verifyPayment } from '../controllers/paymentController.js';
-import { protect } from '../middleware/authMiddleware.js';
+const express = require('express');
+const { createPayment, verifyPayment } = require('../controllers/paymentController.js');
+const { protect } = require('../middleware/authMiddleware.js');
 
 const router = express.Router();
 
@@ -9,4 +9,5 @@ router.use(protect);
 router.post('/create', createPayment);
 router.post('/verify', verifyPayment);
 
-export default router;
+module.exports = router;
+

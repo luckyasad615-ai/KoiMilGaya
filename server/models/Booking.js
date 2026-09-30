@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const bookingSchema = new mongoose.Schema({
   bookedBy: {
@@ -47,4 +47,5 @@ const bookingSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.models.Booking || mongoose.model('Booking', bookingSchema);
+module.exports = mongoose.models.Booking || mongoose.model('Booking', bookingSchema);
+

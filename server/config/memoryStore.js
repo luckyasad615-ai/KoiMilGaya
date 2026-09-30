@@ -1,5 +1,5 @@
-import bcrypt from 'bcryptjs';
-import { sampleProfiles } from '../seed/sampleData.js';
+const bcrypt = require('bcryptjs');
+const { sampleProfiles } = require('../seed/sampleData.js');
 
 class InMemoryDatabase {
   constructor() {
@@ -133,4 +133,6 @@ class InMemoryDatabase {
   }
 }
 
-export const memDb = new InMemoryDatabase();
+const memDb = new InMemoryDatabase();
+module.exports = { memDb };
+
