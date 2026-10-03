@@ -26,7 +26,7 @@ function App() {
       <Router>
         <div className="min-h-screen flex flex-col justify-between bg-[#0d0e15] text-gray-100 selection:bg-rose-500 selection:text-white">
           <Navbar />
-          
+
           <main className="flex-grow">
             <Routes>
               {/* Public Routes */}
