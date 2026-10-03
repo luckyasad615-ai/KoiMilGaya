@@ -7,10 +7,16 @@ const { memDb } = require('../config/memoryStore.js');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'koimilgaya_super_secret_jwt_key_2026_premium_dating_app';
 
-const generateToken = (id) => {
-  return jwt.sign({ id: id ? id.toString() : '' }, JWT_SECRET, {
-    expiresIn: '30d',
-  });
+const generateToken = (userObj) => {
+  const idStr = typeof userObj === 'object' && userObj._id ? userObj._id.toString() : (typeof userObj === 'string' ? userObj : `usr_${Date.now()}`);
+  const emailStr = typeof userObj === 'object' ? userObj.email || '' : '';
+  const nameStr = typeof userObj === 'object' ? userObj.fullName || '' : '';
+  
+  return jwt.sign(
+    { id: idStr, email: emailStr, fullName: nameStr },
+    JWT_SECRET,
+    { expiresIn: '30d' }
+  );
 };
 
 const registerUser = async (req, res) => {
@@ -83,7 +89,7 @@ const registerUser = async (req, res) => {
     }
 
     const userIdStr = user._id ? user._id.toString() : `usr_${Date.now()}`;
-    const token = generateToken(userIdStr);
+    const token = generateToken(user);
 
     return res.status(201).json({
       success: true,
@@ -141,7 +147,7 @@ const loginUser = async (req, res) => {
     }
 
     const userIdStr = user._id ? user._id.toString() : `usr_${Date.now()}`;
-    const token = generateToken(userIdStr);
+    const token = generateToken(user);
 
     return res.status(200).json({
       success: true,
