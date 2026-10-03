@@ -17,7 +17,7 @@ const LandingPage = () => {
       try {
         const res = await API.get('/users');
         if (res.success && res.users) {
-          setFeaturedProfiles(res.users.slice(0, 4));
+          setFeaturedProfiles(res.users.slice(0, 3));
         }
       } catch (err) {
         console.error('Failed to load landing profiles:', err);
@@ -65,7 +65,7 @@ const LandingPage = () => {
               ) : (
                 <>
                   <Link
-                    to="/discover"
+                    to="/login"
                     className="w-full sm:w-auto px-8 py-4 rounded-2xl text-base font-bold btn-gradient flex items-center justify-center space-x-2 shadow-xl shadow-rose-600/30"
                   >
                     <span>Start Exploring Profiles</span>
@@ -149,7 +149,7 @@ const LandingPage = () => {
           </div>
           
           <Link
-            to="/discover"
+            to={isAuthenticated ? "/discover" : "/login"}
             className="text-sm font-semibold text-rose-400 hover:text-rose-300 flex items-center space-x-1"
           >
             <span>View All Profiles</span>
@@ -158,13 +158,13 @@ const LandingPage = () => {
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map((i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
               <SkeletonCard key={i} />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {featuredProfiles.map((profile) => (
               <ProfileCard key={profile._id} profile={profile} />
             ))}

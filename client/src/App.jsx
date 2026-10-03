@@ -33,13 +33,27 @@ function App() {
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
-              <Route path="/discover" element={<DiscoverPage />} />
-              <Route path="/profile/:id" element={<ProfileDetailPage />} />
               <Route path="/safety" element={<SafetyPage />} />
               <Route path="/privacy" element={<PrivacyPage />} />
               <Route path="/terms" element={<TermsPage />} />
 
               {/* Protected Member Routes */}
+              <Route
+                path="/discover"
+                element={
+                  <ProtectedWrapper>
+                    <DiscoverPage />
+                  </ProtectedWrapper>
+                }
+              />
+              <Route
+                path="/profile/:id"
+                element={
+                  <ProtectedWrapper>
+                    <ProfileDetailPage />
+                  </ProtectedWrapper>
+                }
+              />
               <Route
                 path="/profile"
                 element={

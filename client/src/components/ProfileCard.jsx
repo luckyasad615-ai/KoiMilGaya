@@ -1,18 +1,41 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { MapPin, Calendar, Heart, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { MapPin, Calendar, Heart } from 'lucide-react';
 
 const ProfileCard = ({ profile }) => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
+  const handleCardClick = () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+    } else {
+      navigate(`/profile/${profile._id}`);
+    }
+  };
+
+  const handleViewProfile = (e) => {
+    e.stopPropagation();
+    if (!isAuthenticated) {
+      navigate('/login');
+    } else {
+      navigate(`/profile/${profile._id}`);
+    }
+  };
 
   const handleBookMeeting = (e) => {
     e.stopPropagation();
-    navigate(`/book/${profile._id}`);
+    if (!isAuthenticated) {
+      navigate('/login');
+    } else {
+      navigate(`/book/${profile._id}`);
+    }
   };
 
   return (
     <div 
-      onClick={() => navigate(`/profile/${profile._id}`)}
+      onClick={handleCardClick}
       className="group relative rounded-3xl overflow-hidden glass-card glass-card-hover cursor-pointer flex flex-col h-[480px]"
     >
       {/* Background Image Container */}
@@ -64,13 +87,12 @@ const ProfileCard = ({ profile }) => {
 
           {/* Action Buttons */}
           <div className="grid grid-cols-2 gap-2.5 pt-1">
-            <Link
-              to={`/profile/${profile._id}`}
-              onClick={(e) => e.stopPropagation()}
+            <button
+              onClick={handleViewProfile}
               className="w-full text-center py-2.5 px-3 rounded-xl text-xs font-medium btn-secondary-glass flex items-center justify-center space-x-1"
             >
               <span>View Profile</span>
-            </Link>
+            </button>
 
             <button
               onClick={handleBookMeeting}
