@@ -239,7 +239,7 @@ const PaymentPage = () => {
           <div className="space-y-2 border-t border-white/10 pt-4 text-xs">
             <div className="flex justify-between text-gray-400">
               <span>Standard Booking Fee</span>
-              <span className="text-white font-medium">$5.00 USD / PKR 499 / 5 USDT</span>
+              <span className="text-white font-medium">$2.00 USD / PKR 499 / 2 USDT</span>
             </div>
             <div className="flex justify-between text-gray-400">
               <span>Identity Verification Tax</span>
@@ -247,7 +247,7 @@ const PaymentPage = () => {
             </div>
             <div className="flex justify-between text-base font-extrabold text-white border-t border-white/10 pt-3">
               <span>Total Payable</span>
-              <span className="text-gradient">$5.00 USD / PKR 499 / 5 USDT</span>
+              <span className="text-gradient">$2.00 USD / PKR 499 / 2 USDT</span>
             </div>
           </div>
         </div>
@@ -324,7 +324,7 @@ const PaymentPage = () => {
                     USDT Cryptocurrency Payment
                   </span>
                   <span className="text-emerald-300 font-bold px-2.5 py-0.5 rounded-md bg-emerald-500/20 border border-emerald-500/40">
-                    5.00 USDT
+                    2.00 USDT
                   </span>
                 </div>
 
@@ -367,7 +367,7 @@ const PaymentPage = () => {
                       alt={`${currentCrypto.network} QR Code`}
                       className="w-36 h-36 object-contain rounded-xl border-2 border-emerald-400 bg-white p-1.5 shadow-lg"
                     />
-                    <span className="text-[10px] text-emerald-300 block mt-1 font-semibold">Scan QR for 5 USDT</span>
+                    <span className="text-[10px] text-emerald-300 block mt-1 font-semibold">Scan QR for 2 USDT</span>
                   </div>
 
                   {/* Wallet Details */}
@@ -415,7 +415,7 @@ const PaymentPage = () => {
                     className="w-full px-4 py-3 rounded-xl bg-white/5 border border-emerald-500/40 text-white font-mono text-xs focus:outline-none focus:border-emerald-400"
                   />
                   <p className="text-[11px] text-gray-400">
-                    Copy the Transaction Hash / TxID from your wallet (Binance, Trust Wallet, OKX, Bybit, etc.) after sending 5 USDT.
+                    Copy the Transaction Hash / TxID from your wallet (Binance, Trust Wallet, OKX, Bybit, etc.) after sending 2 USDT.
                   </p>
                 </div>
 
@@ -529,7 +529,7 @@ const PaymentPage = () => {
                     Credit / Debit Card Checkout
                   </span>
                   <span className="text-purple-300 font-bold px-2.5 py-0.5 rounded-md bg-purple-500/20 border border-purple-500/40">
-                    $5.00 USD
+                    $2.00 USD
                   </span>
                 </div>
 
@@ -609,10 +609,10 @@ const PaymentPage = () => {
                   <Lock className="w-5 h-5 text-emerald-300" />
                   <span>
                     {paymentMethod === 'crypto'
-                      ? 'Submit TxID & Verify 5 USDT Payment'
+                      ? 'Submit TxID & Verify 2 USDT Payment'
                       : paymentMethod === 'easypaisa'
                       ? 'Submit TRX ID & Confirm PKR 499 Payment'
-                      : 'Pay $5.00 USD & Confirm Meeting'}
+                      : 'Pay $2.00 USD & Confirm Meeting'}
                   </span>
                 </>
               )}

@@ -60,7 +60,7 @@ const BookingSuccessPage = () => {
           </div>
           <h1 className="text-3xl sm:text-4xl font-black text-white">Your Meeting Is Confirmed!</h1>
           <p className="text-gray-300 text-xs sm:text-sm">
-            Payment of $5.00 USD / PKR 499 / Crypto was processed successfully. Have a wonderful meeting!
+            Payment of $2.00 USD / PKR 499 / Crypto was processed successfully. Have a wonderful meeting!
           </p>
         </div>
       </div>
@@ -127,7 +127,7 @@ const BookingSuccessPage = () => {
           {/* Payment receipt line */}
           <div className="flex items-center justify-between pt-2 border-t border-white/10 text-xs">
             <span className="text-gray-400">Total Amount Paid</span>
-            <span className="text-base font-extrabold text-white">$5.00 USD / PKR 499 / Crypto (Paid)</span>
+            <span className="text-base font-extrabold text-white">$2.00 USD / PKR 499 / Crypto (Paid)</span>
           </div>
 
         </div>

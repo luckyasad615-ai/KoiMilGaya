@@ -70,7 +70,7 @@ const DiscoverPage = () => {
             Explore Global <span className="text-gradient">Member Profiles</span>
           </h1>
           <p className="text-gray-400 text-xs sm:text-sm">
-            Find attractive single members locally & worldwide. Book dates for $5 USD / PKR 499 / Crypto (USDT).
+            Find attractive single members locally & worldwide. Book dates for $2 USD / PKR 499 / Crypto (USDT).
           </p>
         </div>
 

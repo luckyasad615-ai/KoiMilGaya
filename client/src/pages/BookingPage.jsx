@@ -211,7 +211,7 @@ const BookingPage = () => {
         <div className="p-5 rounded-2xl bg-gradient-to-r from-rose-950/60 to-purple-950/40 border border-rose-500/30 flex items-center justify-between">
           <div>
             <span className="text-xs text-rose-300 font-semibold block">Required Global Booking Fee</span>
-            <span className="text-2xl font-black text-white">$5.00 USD / PKR 499 / Crypto</span>
+            <span className="text-2xl font-black text-white">$2.00 USD / PKR 499 / Crypto</span>
           </div>
           <div className="text-right">
             <span className="inline-flex items-center space-x-1 px-3 py-1 rounded-full bg-yellow-500/10 text-yellow-300 text-[11px] font-bold border border-yellow-500/30">
@@ -231,7 +231,7 @@ const BookingPage = () => {
             <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
           ) : (
             <>
-              <span>Proceed to Checkout ($5 / PKR 499 / Crypto)</span>
+              <span>Proceed to Checkout ($2 / PKR 499 / Crypto)</span>
               <ArrowRight className="w-5 h-5" />
             </>
           )}

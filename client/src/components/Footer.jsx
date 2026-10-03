@@ -81,10 +81,10 @@ const Footer = () => {
               </div>
               <div className="pt-2 space-y-1.5">
                 <div className="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-semibold bg-rose-500/10 text-rose-300 border border-rose-500/20">
-                  Meeting Fee: $5 USD / PKR 499 / Crypto (USDT)
+                  Meeting Fee: $2 USD / PKR 499 / Crypto (USDT)
                 </div>
                 <div className="text-[11px] text-emerald-400 font-medium flex items-center gap-1">
-                  ⚡ Crypto Payments (USDT, BTC, ETH) Accepted
+                  ⚡ Crypto Payments (USDT) Accepted
                 </div>
               </div>
             </div>

@@ -89,12 +89,12 @@ const LandingPage = () => {
                 <p className="text-xs text-gray-400">Worldwide Members</p>
               </div>
               <div>
-                <p className="text-xl sm:text-2xl font-bold text-rose-400">$5 / PKR 499</p>
+                <p className="text-xl sm:text-2xl font-bold text-rose-400">$2 / PKR 499</p>
                 <p className="text-xs text-gray-400">Fixed Booking Fee</p>
               </div>
               <div>
                 <p className="text-xl sm:text-2xl font-bold text-emerald-400">Crypto Accepted</p>
-                <p className="text-xs text-gray-400">USDT / BTC / Card</p>
+                <p className="text-xs text-gray-400">USDT / Card</p>
               </div>
             </div>
 
@@ -125,7 +125,7 @@ const LandingPage = () => {
                       </p>
                     </div>
                     <div className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-rose-500 to-purple-600 text-white text-xs font-bold shadow-md">
-                      $5 / Crypto
+                      $2 / Crypto
                     </div>
                   </div>
                 </div>
@@ -208,7 +208,7 @@ const LandingPage = () => {
             </div>
             <h3 className="text-lg font-bold text-white mb-2">Pay via Card or Crypto</h3>
             <p className="text-gray-400 text-xs leading-relaxed">
-              Pay the standard booking fee ($5 / PKR 499) instantly using Crypto (USDT / BTC), Credit Card, or Mobile Wallet.
+              Pay the standard booking fee ($2 / PKR 499) instantly using Crypto (USDT), Credit Card, or Mobile Wallet.
             </p>
           </div>
 
