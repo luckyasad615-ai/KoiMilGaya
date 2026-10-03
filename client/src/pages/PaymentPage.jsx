@@ -4,7 +4,18 @@ import API from '../services/api';
 import { CreditCard, ShieldCheck, Lock, CheckCircle2, AlertCircle, Sparkles, Building, Wallet, Calendar, MapPin, Clock, Coins, Copy, Check } from 'lucide-react';
 
 const CRYPTO_WALLETS = {
-  USDT_TRC20: 'TNLPdssF6EZMiPHszvMjQ51GYxkaN4baL1',
+  USDT_TRC20: {
+    id: 'USDT_TRC20',
+    network: 'TRC20 (Tron Network)',
+    address: 'TNLPdssF6EZMiPHszvMjQ51GYxkaN4baL1',
+    qr: '/usdt-qr.jpg',
+  },
+  USDT_ERC20: {
+    id: 'USDT_ERC20',
+    network: 'ERC20 (Ethereum Network)',
+    address: '0x70c653a485f7619728246eb0d6a0c0c6b3531bc3',
+    qr: '/usdt-erc20-qr.jpg',
+  },
 };
 
 const EASYPAISA_DETAILS = {
@@ -21,7 +32,8 @@ const PaymentPage = () => {
   const [loading, setLoading] = useState(true);
 
   // Form states
-  const [paymentMethod, setPaymentMethod] = useState('crypto'); // Default to Crypto or EasyPaisa
+  const [paymentMethod, setPaymentMethod] = useState('crypto'); // Default to Crypto
+  const [selectedCrypto, setSelectedCrypto] = useState('USDT_TRC20'); // 'USDT_TRC20' or 'USDT_ERC20'
   
   // Card states
   const [cardNumber, setCardNumber] = useState('');
@@ -82,7 +94,7 @@ const PaymentPage = () => {
     // Strict Security Proof Validation
     if (paymentMethod === 'crypto') {
       if (!txHash.trim() || txHash.trim().length < 8) {
-        setError('Security Requirement: Please provide a valid USDT (TRC20) Transaction Hash (TxID) after sending 5 USDT.');
+        setError(`Security Requirement: Please provide a valid ${CRYPTO_WALLETS[selectedCrypto].network} Transaction Hash (TxID) after sending 5 USDT.`);
         return;
       }
     } else if (paymentMethod === 'easypaisa') {
@@ -101,7 +113,7 @@ const PaymentPage = () => {
       setSubmitting(true);
       
       const submittedTxHash = paymentMethod === 'crypto' 
-        ? txHash.trim() 
+        ? `USDT-${selectedCrypto}-${txHash.trim()}` 
         : paymentMethod === 'easypaisa'
         ? `TRX-${easypaisaTrxId.trim()}-${easypaisaSenderName.trim()}`
         : `CARD-${Date.now()}`;
@@ -152,6 +164,7 @@ const PaymentPage = () => {
   }
 
   const profile = booking.profileId;
+  const currentCrypto = CRYPTO_WALLETS[selectedCrypto];
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
@@ -246,7 +259,7 @@ const PaymentPage = () => {
           {/* Payment Method Selector Buttons */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             
-            {/* USDT TRC20 Button */}
+            {/* USDT Crypto Button */}
             <button
               type="button"
               onClick={() => setPaymentMethod('crypto')}
@@ -258,8 +271,8 @@ const PaymentPage = () => {
             >
               <Coins className="w-6 h-6 text-emerald-400" />
               <div className="text-center">
-                <span className="block font-bold">USDT (TRC20)</span>
-                <span className="text-[10px] text-emerald-400">Official Crypto QR</span>
+                <span className="block font-bold">USDT Crypto</span>
+                <span className="text-[10px] text-emerald-400">TRC20 & ERC20 QR</span>
               </div>
             </button>
 
@@ -301,18 +314,47 @@ const PaymentPage = () => {
 
           <form onSubmit={handlePayAndConfirm} className="space-y-6">
             
-            {/* 1. USDT TRC20 CRYPTO METHOD */}
+            {/* 1. USDT CRYPTO METHOD (TRC20 / ERC20 TOGGLE) */}
             {paymentMethod === 'crypto' && (
               <div className="space-y-5 p-6 rounded-2xl bg-emerald-950/20 border border-emerald-500/30 text-xs">
                 
                 <div className="flex items-center justify-between border-b border-emerald-500/20 pb-3">
                   <span className="font-bold text-emerald-400 uppercase tracking-wider text-xs flex items-center gap-1.5">
                     <Coins className="w-4 h-4" />
-                    USDT (TRC20 - Tron Network) Payment
+                    USDT Cryptocurrency Payment
                   </span>
                   <span className="text-emerald-300 font-bold px-2.5 py-0.5 rounded-md bg-emerald-500/20 border border-emerald-500/40">
                     5.00 USDT
                   </span>
+                </div>
+
+                {/* Network Selection Buttons */}
+                <div className="space-y-2">
+                  <label className="block text-gray-300 font-semibold text-xs">Select USDT Network *</label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedCrypto('USDT_TRC20')}
+                      className={`p-3 rounded-xl border text-xs font-bold transition-all ${
+                        selectedCrypto === 'USDT_TRC20'
+                          ? 'bg-emerald-500/30 border-emerald-400 text-white shadow-md'
+                          : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      USDT (TRC20 Tron)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedCrypto('USDT_ERC20')}
+                      className={`p-3 rounded-xl border text-xs font-bold transition-all ${
+                        selectedCrypto === 'USDT_ERC20'
+                          ? 'bg-emerald-500/30 border-emerald-400 text-white shadow-md'
+                          : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      USDT (ERC20 Ethereum)
+                    </button>
+                  </div>
                 </div>
 
                 {/* QR Code and Wallet Box */}
@@ -321,26 +363,26 @@ const PaymentPage = () => {
                   {/* QR Image */}
                   <div className="shrink-0 text-center">
                     <img
-                      src="/usdt-qr.jpg"
-                      alt="USDT TRC20 QR Code"
+                      src={currentCrypto.qr}
+                      alt={`${currentCrypto.network} QR Code`}
                       className="w-36 h-36 object-contain rounded-xl border-2 border-emerald-400 bg-white p-1.5 shadow-lg"
                     />
-                    <span className="text-[10px] text-emerald-300 block mt-1 font-semibold">Scan QR to Pay 5 USDT</span>
+                    <span className="text-[10px] text-emerald-300 block mt-1 font-semibold">Scan QR for 5 USDT</span>
                   </div>
 
                   {/* Wallet Details */}
                   <div className="space-y-3 flex-grow w-full">
                     <div>
-                      <span className="text-gray-400 block text-[11px] mb-1">Official USDT TRC20 Deposit Address:</span>
+                      <span className="text-gray-400 block text-[11px] mb-1">Official {currentCrypto.network} Deposit Address:</span>
                       <div className="p-3 rounded-lg bg-emerald-950/60 font-mono text-xs text-emerald-300 break-all border border-emerald-500/40 flex items-center justify-between gap-2">
-                        <span>{CRYPTO_WALLETS.USDT_TRC20}</span>
+                        <span>{currentCrypto.address}</span>
                       </div>
                     </div>
 
                     <button
                       type="button"
-                      onClick={() => copyToClipboard(CRYPTO_WALLETS.USDT_TRC20, 'crypto')}
-                      className="w-full py-2 px-3 rounded-lg bg-emerald-500 text-black font-bold text-xs flex items-center justify-center space-x-1.5 hover:bg-emerald-400 transition-colors shadow-md"
+                      onClick={() => copyToClipboard(currentCrypto.address, 'crypto')}
+                      className="w-full py-2.5 px-3 rounded-lg bg-emerald-500 text-black font-bold text-xs flex items-center justify-center space-x-1.5 hover:bg-emerald-400 transition-colors shadow-md"
                     >
                       {copiedAddress ? (
                         <>
@@ -350,7 +392,7 @@ const PaymentPage = () => {
                       ) : (
                         <>
                           <Copy className="w-4 h-4" />
-                          <span>Copy USDT Address</span>
+                          <span>Copy {selectedCrypto === 'USDT_TRC20' ? 'TRC20' : 'ERC20'} Address</span>
                         </>
                       )}
                     </button>
@@ -368,7 +410,7 @@ const PaymentPage = () => {
                     type="text"
                     value={txHash}
                     onChange={(e) => setTxHash(e.target.value)}
-                    placeholder="Enter your USDT Transaction Hash / TxID (e.g. 7c9a8b7c6d5e...)"
+                    placeholder={`Enter your ${currentCrypto.network} Transaction Hash / TxID (e.g. 0x7c9a... or 7c9a...)`}
                     required
                     className="w-full px-4 py-3 rounded-xl bg-white/5 border border-emerald-500/40 text-white font-mono text-xs focus:outline-none focus:border-emerald-400"
                   />
