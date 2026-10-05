@@ -20,139 +20,189 @@ const sampleProfiles = [
   },
   {
     _id: "65a000000000000000000002",
-    fullName: "Sophia Reynolds",
-    email: "sophia.r@example.com",
+    fullName: "Syeda Fatima Zahra",
+    email: "fatima.zahra@example.com",
     password: "Password123!",
-    age: 26,
+    age: 23,
     gender: "Female",
-    country: "United Kingdom",
-    city: "London",
-    profileImage: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80&w=800",
+    country: "Pakistan",
+    city: "Islamabad",
+    profileImage: "/profiles/girl2_1.jpeg",
     profileImages: [
-      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=800"
+      "/profiles/girl2_1.jpeg",
+      "/profiles/girl2_2.jpeg",
+      "/profiles/girl2_3.jpeg"
     ],
-    bio: "Creative director based in Central London. Love exploring rooftop coffee spots, indie film festivals, and weekend flights to Italy.",
-    interests: ["Design", "Rooftop Cafes", "Indie Cinema", "Travel", "Art Galleries"],
+    bio: "Software Engineer & Mobile App Developer 💻. Love tech innovations, espresso coffee dates, sunset views at Margalla Hills, and long evening drives.",
+    interests: ["Software Engineer", "Tech Startups", "Espresso", "Margalla Hikes", "Coding"],
     isSample: true
   },
   {
     _id: "65a000000000000000000003",
-    fullName: "Zain Ahmed",
-    email: "zain.ahmed@example.com",
+    fullName: "Hira Farooq",
+    email: "hira.farooq@example.com",
     password: "Password123!",
-    age: 27,
-    gender: "Male",
+    age: 25,
+    gender: "Female",
     country: "Pakistan",
-    city: "Islamabad",
-    profileImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800",
+    city: "Karachi",
+    profileImage: "/profiles/girl3_1.jpeg",
     profileImages: [
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=800"
+      "/profiles/girl3_1.jpeg",
+      "/profiles/girl3_2.jpeg",
+      "/profiles/girl3_3.jpeg"
     ],
-    bio: "Software founder, tennis player, and vintage car collector. Looking for someone genuine to explore quiet cafes and talk about big ideas.",
-    interests: ["Tech Startups", "Tennis", "Photography", "Vintage Cars", "Travel"],
+    bio: "Corporate Banker & Financial Analyst at Habib Bank Karachi 📊. Passionate about wealth management, seaside dining, live music, and book clubs.",
+    interests: ["Corporate Banking", "Fintech", "Seaside Dining", "Reading", "Live Music"],
     isSample: true
   },
   {
     _id: "65a000000000000000000004",
-    fullName: "Michael Vance",
-    email: "michael.vance@example.com",
+    fullName: "Ayla Noor",
+    email: "ayla.noor@example.com",
     password: "Password123!",
-    age: 29,
-    gender: "Male",
-    country: "United States",
-    city: "New York",
-    profileImage: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=800",
+    age: 22,
+    gender: "Female",
+    country: "Pakistan",
+    city: "Lahore",
+    profileImage: "/profiles/girl4_1.jpeg",
     profileImages: [
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800"
+      "/profiles/girl4_1.jpeg",
+      "/profiles/girl4_2.jpeg",
+      "/profiles/girl4_3.jpeg"
     ],
-    bio: "Venture partner in NYC. Avid runner, jazz lover, and espresso addict. Always up for intellectual chats over artisan coffee.",
-    interests: ["Venture Capital", "Jazz Music", "Marathon Running", "Coffee", "Web3"],
+    bio: "Architectural Designer & Fine Artist 🎨. Obsessed with minimalist interior design, cozy coffee spots in Gulberg, and art gallery exhibitions.",
+    interests: ["Architect", "Interior Design", "Painting", "Art Galleries", "Coffee"],
     isSample: true
   },
   {
     _id: "65a000000000000000000005",
-    fullName: "Mahnoor Khan",
-    email: "mahnoor.khan@example.com",
+    fullName: "Zoya Hashmi",
+    email: "zoya.hashmi@example.com",
     password: "Password123!",
-    age: 25,
+    age: 24,
     gender: "Female",
-    country: "United Arab Emirates",
-    city: "Dubai",
-    profileImage: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=800",
+    country: "Pakistan",
+    city: "Rawalpindi",
+    profileImage: "/profiles/girl5_1.jpeg",
     profileImages: [
-      "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=800"
+      "/profiles/girl5_1.jpeg",
+      "/profiles/girl5_2.jpeg",
+      "/profiles/girl5_3.jpeg"
     ],
-    bio: "Fashion designer with a love for ocean views and live acoustic music. Always hunting for the finest dining spots in Dubai.",
-    interests: ["Fashion Design", "Live Music", "Fine Dining", "Seaside Walks", "Interior Design"],
+    bio: "Clinical Psychologist & Mental Health Counselor 🧠. Believer in emotional intelligence, deep listening, mindful living, and peaceful evening walks.",
+    interests: ["Psychologist", "Mental Health", "Mindfulness", "Philosophy", "Tea"],
     isSample: true
   },
   {
     _id: "65a000000000000000000006",
-    fullName: "Zara Shah",
-    email: "zara.shah@example.com",
+    fullName: "Mahnoor Sheikh",
+    email: "mahnoor.sheikh@example.com",
     password: "Password123!",
-    age: 23,
+    age: 26,
     gender: "Female",
-    country: "Canada",
-    city: "Toronto",
-    profileImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=800",
+    country: "Pakistan",
+    city: "Islamabad",
+    profileImage: "/profiles/girl6_1.jpeg",
     profileImages: [
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=800"
+      "/profiles/girl6_1.jpeg",
+      "/profiles/girl6_2.jpeg",
+      "/profiles/girl6_3.jpeg"
     ],
-    bio: "Digital strategist & podcast host in Toronto. Big fan of indie cinema, sunset photography, and meaningful coffee dates.",
-    interests: ["Podcasting", "Indie Cinema", "Digital Marketing", "Reading", "Sunsets"],
+    bio: "International Flight Attendant & Travel Vlogger ✈️. Explored 20+ countries! Love aviation, boutique cafes, fashion styling, and weekend road trips.",
+    interests: ["Flight Attendant", "Aviation", "World Travel", "Fashion", "Vlogging"],
     isSample: true
   },
   {
     _id: "65a000000000000000000007",
-    fullName: "Danial Tariq",
-    email: "danial.tariq@example.com",
+    fullName: "Kainat Gillani",
+    email: "kainat.gillani@example.com",
     password: "Password123!",
-    age: 30,
-    gender: "Male",
+    age: 23,
+    gender: "Female",
     country: "Pakistan",
-    city: "Karachi",
-    profileImage: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=800",
+    city: "Peshawar",
+    profileImage: "/profiles/girl7_1.jpeg",
     profileImages: [
-      "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=800"
+      "/profiles/girl7_1.jpeg",
+      "/profiles/girl7_2.jpeg"
     ],
-    bio: "Investment banker & foodie. Always excited about exploring new culinary places, playing polo, and talking business & tech trends.",
-    interests: ["Finance", "Gastronomy", "Polo", "Investing", "Travel"],
+    bio: "Fashion Stylist & Digital Content Creator 📸. Passionate about traditional fusion wear, aesthetic photography, and discovering hidden food gems.",
+    interests: ["Fashion Design", "Photography", "Content Creation", "Foodie", "Travel"],
     isSample: true
   },
   {
     _id: "65a000000000000000000008",
-    fullName: "Lucas Miller",
-    email: "lucas.miller@example.com",
+    fullName: "Noor-ul-Ain Khan",
+    email: "noorulain.khan@example.com",
     password: "Password123!",
-    age: 28,
-    gender: "Male",
-    country: "Australia",
-    city: "Sydney",
-    profileImage: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=800",
+    age: 25,
+    gender: "Female",
+    country: "Pakistan",
+    city: "Faisalabad",
+    profileImage: "/profiles/girl8_1.jpeg",
     profileImages: [
-      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=800"
+      "/profiles/girl8_1.jpeg",
+      "/profiles/girl8_2.jpeg"
     ],
-    bio: "Architectural photographer & surfer. Enjoy beach morning brews, acoustic jam sessions, and spontaneous weekend road trips.",
-    interests: ["Surfing", "Photography", "Acoustic Blues", "Cooking", "Travel"],
+    bio: "Lecturer in English Literature & Academic Researcher 📚. Love classical novels, intellectual debates, quiet coffee corners, and gardening.",
+    interests: ["University Lecturer", "Literature", "Research", "Writing", "Coffee"],
+    isSample: true
+  },
+  {
+    _id: "65a000000000000000000009",
+    fullName: "Dr. Alishba Qureshi",
+    email: "alishba.q@example.com",
+    password: "Password123!",
+    age: 24,
+    gender: "Female",
+    country: "Pakistan",
+    city: "Multan",
+    profileImage: "/profiles/girl9_1.jpeg",
+    profileImages: [
+      "/profiles/girl9_1.jpeg",
+      "/profiles/girl9_2.jpeg"
+    ],
+    bio: "Dental Surgeon (BDS) & Aesthetic Dentist 🦷. Spreading bright smiles, passionate about skincare, organic living, and fine dining.",
+    interests: ["Dentist / BDS", "Healthcare", "Skincare", "Fine Dining", "Aesthetics"],
+    isSample: true
+  },
+  {
+    _id: "65a000000000000000000010",
+    fullName: "Natalia Mirza",
+    email: "natalia.mirza@example.com",
+    password: "Password123!",
+    age: 23,
+    gender: "Female",
+    country: "Pakistan",
+    city: "Karachi",
+    profileImage: "/profiles/girl10_1.jpeg",
+    profileImages: [
+      "/profiles/girl10_1.jpeg",
+      "/profiles/girl10_2.jpeg"
+    ],
+    bio: "Brand Manager & Event Planner 🎉. Passionate about public relations, luxury event styling, beach sunsets, and rooftop dining.",
+    interests: ["Brand Manager", "Event Planning", "Public Relations", "Beach Sunsets", "Fashion"],
+    isSample: true
+  },
+  {
+    _id: "65a000000000000000000011",
+    fullName: "Laiba Chaudhry",
+    email: "laiba.c@example.com",
+    password: "Password123!",
+    age: 22,
+    gender: "Female",
+    country: "Pakistan",
+    city: "Lahore",
+    profileImage: "/profiles/girl11_1.jpeg",
+    profileImages: [
+      "/profiles/girl11_1.jpeg",
+      "/profiles/girl11_2.jpeg"
+    ],
+    bio: "Civil Engineer & Interior Decorator 🏗️. Designing modern spaces, passionate about architecture, outdoor sketching, and artisan tea lounges.",
+    interests: ["Civil Engineer", "Architecture", "Interior Design", "Sketching", "Tea"],
     isSample: true
   }
 ];
 
 module.exports = { sampleProfiles };
-
-
