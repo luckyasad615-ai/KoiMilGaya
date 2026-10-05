@@ -6,11 +6,46 @@ import ProfileCard from '../components/ProfileCard';
 import SkeletonCard from '../components/SkeletonCard';
 import { Heart, Sparkles, ShieldCheck, MapPin, Calendar, CheckCircle2, Star, Users, Coffee, ArrowRight } from 'lucide-react';
 
+const heroFeaturedList = [
+  {
+    _id: "65a000000000000000000001",
+    fullName: "Dr. Anum Chaudhry",
+    age: 24,
+    city: "Lahore",
+    profession: "MBBS Doctor",
+    image: "/profiles/girl1_1.jpg",
+  },
+  {
+    _id: "65a000000000000000000002",
+    fullName: "Syeda Fatima Zahra",
+    age: 23,
+    city: "Islamabad",
+    profession: "Software Engineer",
+    image: "/profiles/girl2_1.jpeg",
+  },
+  {
+    _id: "65a000000000000000000006",
+    fullName: "Mahnoor Sheikh",
+    age: 26,
+    city: "Islamabad",
+    profession: "Flight Attendant",
+    image: "/profiles/girl6_1.jpeg",
+  },
+];
+
 const LandingPage = () => {
   const [featuredProfiles, setFeaturedProfiles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [heroIndex, setHeroIndex] = useState(0);
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setHeroIndex((prev) => (prev + 1) % heroFeaturedList.length);
+    }, 4500);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     const fetchSampleProfiles = async () => {
@@ -101,34 +136,77 @@ const LandingPage = () => {
           </div>
 
 
-          {/* Right Visual Banner / Stacked Card Mockup */}
+          {/* Right Visual Banner / Live Member Showcase Card */}
           <div className="lg:col-span-5 relative flex justify-center items-center">
             <div className="relative w-full max-w-sm">
               
               {/* Background ambient glow */}
               <div className="absolute -inset-4 bg-gradient-to-r from-rose-500 to-purple-600 rounded-3xl blur-2xl opacity-40 animate-pulse" />
 
-              {/* Stacked card hero graphic */}
-              <div className="relative rounded-3xl overflow-hidden glass-card border border-white/20 p-2 shadow-2xl">
-                <img
-                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=800"
-                  alt="Ayesha Malik Profile"
-                  className="w-full h-96 object-cover rounded-2xl"
-                />
+              {/* Real Member Showcase Hero Card */}
+              <div className="relative rounded-3xl overflow-hidden glass-card border border-white/20 p-2.5 shadow-2xl group">
                 
-                <div className="absolute bottom-6 left-6 right-6 p-4 rounded-2xl glass-card backdrop-blur-xl border border-white/20">
+                {/* Verified & Online Badges */}
+                <div className="absolute top-5 left-5 z-20 flex items-center space-x-2">
+                  <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-black/70 backdrop-blur-md text-emerald-400 border border-emerald-500/40 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                    <span>Verified Member</span>
+                  </span>
+                </div>
+
+                <div className="absolute top-5 right-5 z-20">
+                  <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-rose-500/90 text-white backdrop-blur-md shadow-md">
+                    PKR 499 / $2
+                  </span>
+                </div>
+
+                {/* Main Profile Photo */}
+                <div className="relative h-[400px] w-full rounded-2xl overflow-hidden">
+                  <img
+                    src={heroFeaturedList[heroIndex].image}
+                    alt={heroFeaturedList[heroIndex].fullName}
+                    className="w-full h-full object-cover transition-all duration-700 transform group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0d0e15] via-transparent to-transparent" />
+                </div>
+                
+                {/* Profile Card Footer Info */}
+                <div className="absolute bottom-5 left-5 right-5 p-4 rounded-2xl glass-card backdrop-blur-xl border border-white/20">
                   <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="text-lg font-bold text-white">Ayesha Malik, 24</h4>
+                    <div className="space-y-0.5">
+                      <h4 className="text-lg font-bold text-white flex items-center gap-1.5">
+                        <span>{heroFeaturedList[heroIndex].fullName}, {heroFeaturedList[heroIndex].age}</span>
+                        <ShieldCheck className="w-4 h-4 text-rose-400" />
+                      </h4>
                       <p className="text-xs text-rose-300 flex items-center gap-1">
-                        <MapPin className="w-3 h-3" /> Lahore, Pakistan • Architect
+                        <MapPin className="w-3 h-3 text-rose-400" /> 
+                        <span>{heroFeaturedList[heroIndex].city} • {heroFeaturedList[heroIndex].profession}</span>
                       </p>
                     </div>
-                    <div className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-rose-500 to-purple-600 text-white text-xs font-bold shadow-md">
-                      $2 / Crypto
-                    </div>
+
+                    <Link
+                      to={`/profile/${heroFeaturedList[heroIndex]._id}`}
+                      className="px-3.5 py-2 rounded-xl btn-gradient text-xs font-bold text-white shrink-0 shadow-lg flex items-center space-x-1"
+                    >
+                      <span>Book Date</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+
+                  {/* Slide controls dots */}
+                  <div className="flex justify-center items-center gap-1.5 mt-3 pt-2 border-t border-white/10">
+                    {heroFeaturedList.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setHeroIndex(idx)}
+                        className={`h-1.5 rounded-full transition-all duration-300 ${
+                          idx === heroIndex ? 'w-5 bg-rose-500' : 'w-1.5 bg-white/30 hover:bg-white/60'
+                        }`}
+                      />
+                    ))}
                   </div>
                 </div>
+
               </div>
 
             </div>
