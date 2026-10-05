@@ -164,7 +164,7 @@ const getUserById = async (req, res) => {
 const updateProfile = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { fullName, age, gender, city, profileImage, bio, interests } = req.body;
+    const { fullName, age, gender, city, profileImage, profileImages, bio, interests } = req.body;
     const isConnected = await connectDB().catch(() => false);
 
     let updatedUser = null;
@@ -177,6 +177,7 @@ const updateProfile = async (req, res) => {
           if (gender) user.gender = gender;
           if (city) user.city = city;
           if (profileImage) user.profileImage = profileImage;
+          if (Array.isArray(profileImages)) user.profileImages = profileImages;
           if (bio !== undefined) user.bio = bio;
           if (interests) {
             user.interests = Array.isArray(interests) 
@@ -207,6 +208,7 @@ const updateProfile = async (req, res) => {
         gender: gender || existing.gender,
         city: city || existing.city,
         profileImage: profileImage || existing.profileImage,
+        profileImages: Array.isArray(profileImages) ? profileImages : (existing.profileImages || []),
         bio: bio !== undefined ? bio : existing.bio,
         interests: parsedInterests,
       });
