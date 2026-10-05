@@ -20,6 +20,8 @@ const SignupPage = () => {
     city: 'Lahore',
     customCity: '',
     profileImage: '',
+    profileImage2: '',
+    profileImage3: '',
     bio: '',
     interestsInput: '',
     selectedInterests: [],
@@ -37,7 +39,7 @@ const SignupPage = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = (e, fieldName = 'profileImage') => {
     const file = e.target.files[0];
     if (file) {
       setError('');
@@ -47,22 +49,22 @@ const SignupPage = () => {
         img.src = event.target.result;
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 500;
+          const MAX_WIDTH = 600;
           const scale = img.width > MAX_WIDTH ? MAX_WIDTH / img.width : 1;
           canvas.width = img.width * scale;
           canvas.height = img.height * scale;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
-          setFormData((prev) => ({ ...prev, profileImage: compressedDataUrl }));
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+          setFormData((prev) => ({ ...prev, [fieldName]: compressedDataUrl }));
         };
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const removePhoto = () => {
-    setFormData((prev) => ({ ...prev, profileImage: '' }));
+  const removePhoto = (fieldName = 'profileImage') => {
+    setFormData((prev) => ({ ...prev, [fieldName]: '' }));
   };
 
   const toggleInterest = (interest) => {
@@ -105,10 +107,13 @@ const SignupPage = () => {
     }
 
     // Default image if blank
-    const imageToUse = formData.profileImage.trim() || 
-      (formData.gender === 'Male'
-        ? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800'
-        : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=800');
+    const defaultImg = formData.gender === 'Male'
+      ? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800'
+      : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=800';
+
+    const rawImages = [formData.profileImage, formData.profileImage2, formData.profileImage3].filter(Boolean);
+    const finalProfileImages = rawImages.length > 0 ? rawImages : [defaultImg];
+    const imageToUse = finalProfileImages[0];
 
     // Combine selected preset interests + custom typed interests
     const customInterests = formData.interestsInput
@@ -128,6 +133,7 @@ const SignupPage = () => {
         country: formData.country,
         city: finalLocation,
         profileImage: imageToUse,
+        profileImages: finalProfileImages,
         bio: formData.bio,
         interests: allInterests,
       });

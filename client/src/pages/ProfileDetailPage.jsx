@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import API from '../services/api';
-import { MapPin, Calendar, Heart, ShieldCheck, ArrowLeft, Sparkles, User, Check } from 'lucide-react';
+import { MapPin, Calendar, Heart, ShieldCheck, ArrowLeft, Sparkles, User, Check, ChevronLeft, ChevronRight, Camera } from 'lucide-react';
 
 const ProfileDetailPage = () => {
   const { id } = useParams();
@@ -9,6 +9,7 @@ const ProfileDetailPage = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [activeImgIndex, setActiveImgIndex] = useState(0);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -48,6 +49,20 @@ const ProfileDetailPage = () => {
     );
   }
 
+  const galleryImages = (profile.profileImages && profile.profileImages.length > 0)
+    ? profile.profileImages
+    : [profile.profileImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=800'];
+
+  const handleNextPhoto = (e) => {
+    e.stopPropagation();
+    setActiveImgIndex((prev) => (prev + 1) % galleryImages.length);
+  };
+
+  const handlePrevPhoto = (e) => {
+    e.stopPropagation();
+    setActiveImgIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
+  };
+
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       
@@ -64,21 +79,68 @@ const ProfileDetailPage = () => {
       <div className="glass-card rounded-3xl border border-white/10 overflow-hidden shadow-2xl">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
           
-          {/* Left Large Portrait Column */}
-          <div className="lg:col-span-5 relative min-h-[420px] lg:min-h-[580px]">
+          {/* Left Large Portrait Column (With Interactive 3-Photo Carousel) */}
+          <div className="lg:col-span-5 relative min-h-[440px] lg:min-h-[580px] bg-black/40 group overflow-hidden">
             <img
-              src={profile.profileImage || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=800'}
-              alt={profile.fullName}
-              className="w-full h-full object-cover"
+              src={galleryImages[activeImgIndex] || galleryImages[0]}
+              alt={`${profile.fullName} Photo ${activeImgIndex + 1}`}
+              className="w-full h-full object-cover transition-all duration-500 transform scale-100 group-hover:scale-105"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0d0e15] via-transparent to-transparent lg:hidden" />
-            
-            <div className="absolute top-4 left-4">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0d0e15] via-transparent to-black/20" />
+
+            {/* Photo navigation arrows if more than 1 image */}
+            {galleryImages.length > 1 && (
+              <>
+                <button
+                  onClick={handlePrevPhoto}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-black/60 hover:bg-rose-600 text-white backdrop-blur-md transition-all border border-white/20 shadow-lg"
+                  aria-label="Previous Photo"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={handleNextPhoto}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-black/60 hover:bg-rose-600 text-white backdrop-blur-md transition-all border border-white/20 shadow-lg"
+                  aria-label="Next Photo"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </>
+            )}
+
+            {/* City Badge Top Left */}
+            <div className="absolute top-4 left-4 z-10">
               <span className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#0d0e15]/80 backdrop-blur-md text-white border border-white/10 flex items-center gap-1.5">
                 <MapPin className="w-3.5 h-3.5 text-rose-400" />
                 {profile.city}
               </span>
             </div>
+
+            {/* Photo Counter Top Right */}
+            {galleryImages.length > 1 && (
+              <div className="absolute top-4 right-4 z-10">
+                <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-black/70 backdrop-blur-md text-rose-200 border border-white/15 flex items-center gap-1">
+                  <Camera className="w-3 h-3 text-rose-400" />
+                  <span>{activeImgIndex + 1} / {galleryImages.length}</span>
+                </span>
+              </div>
+            )}
+
+            {/* Bottom Dots Navigation */}
+            {galleryImages.length > 1 && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex items-center space-x-2">
+                {galleryImages.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveImgIndex(idx)}
+                    className={`h-2 rounded-full transition-all duration-300 ${
+                      idx === activeImgIndex ? 'w-6 bg-rose-500' : 'w-2 bg-white/40 hover:bg-white/70'
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+
           </div>
 
           {/* Right Profile Details Column */}

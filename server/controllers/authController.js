@@ -21,7 +21,7 @@ const generateToken = (userObj) => {
 
 const registerUser = async (req, res) => {
   try {
-    const { fullName, email, password, confirmPassword, age, gender, country, city, profileImage, bio, interests } = req.body;
+    const { fullName, email, password, confirmPassword, age, gender, country, city, profileImage, profileImages, bio, interests } = req.body;
 
     if (!fullName || !email || !password || !age || !city) {
       return res.status(400).json({ success: false, message: 'Please provide all required fields' });
@@ -62,6 +62,10 @@ const registerUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    const imagesArray = Array.isArray(profileImages) && profileImages.length > 0 
+      ? profileImages.filter(Boolean)
+      : (profileImage ? [profileImage] : []);
+
     const userData = {
       fullName,
       email: email.toLowerCase(),
@@ -70,7 +74,8 @@ const registerUser = async (req, res) => {
       gender: gender || 'Female',
       country: country || 'Worldwide',
       city,
-      profileImage: profileImage || undefined,
+      profileImage: imagesArray[0] || profileImage || undefined,
+      profileImages: imagesArray,
       bio: bio || '',
       interests: Array.isArray(interests) ? interests : (typeof interests === 'string' ? interests.split(',').map(i => i.trim()).filter(Boolean) : []),
     };
@@ -104,6 +109,7 @@ const registerUser = async (req, res) => {
         country: user.country,
         city: user.city,
         profileImage: user.profileImage,
+        profileImages: user.profileImages || (user.profileImage ? [user.profileImage] : []),
         bio: user.bio,
         interests: user.interests,
         createdAt: user.createdAt,
@@ -162,6 +168,7 @@ const loginUser = async (req, res) => {
         country: user.country,
         city: user.city,
         profileImage: user.profileImage,
+        profileImages: user.profileImages || (user.profileImage ? [user.profileImage] : []),
         bio: user.bio,
         interests: user.interests,
         createdAt: user.createdAt,
