@@ -1,21 +1,21 @@
 const sampleProfiles = [
   {
     _id: "65a000000000000000000001",
-    fullName: "Ayesha Malik",
-    email: "ayesha.malik@example.com",
+    fullName: "Dr. Anum Chaudhry",
+    email: "dr.anum@example.com",
     password: "Password123!",
     age: 24,
     gender: "Female",
     country: "Pakistan",
     city: "Lahore",
-    profileImage: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=800",
+    profileImage: "/profiles/girl1_1.jpg",
     profileImages: [
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=800",
-      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80&w=800"
+      "/profiles/girl1_1.jpg",
+      "/profiles/girl1_2.jpg",
+      "/profiles/girl1_3.jpg"
     ],
-    bio: "Architect by day, coffee connoisseur by night. Passionate about minimalism, modern art, deep conversations, and weekend trips.",
-    interests: ["Architecture", "Specialty Coffee", "Hiking", "Literature", "Art"],
+    bio: "MBBS Doctor & Resident Physician at Mayo Hospital Lahore 🩺. Passionate about healthcare, aesthetic coffee lounges, Urdu poetry, and genuine intellectual conversations.",
+    interests: ["Doctor / MBBS", "Aesthetic Cafes", "Urdu Poetry", "Literature", "Travel"],
     isSample: true
   },
   {
